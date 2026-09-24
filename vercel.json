@@ -4,6 +4,14 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/api/meta",
+      "destination": "https://zomoto-app-production.up.railway.app/api/v1/metadata"
+    },
+    {
+      "source": "/api/recommend",
+      "destination": "https://zomoto-app-production.up.railway.app/api/v1/recommendations"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://zomoto-app-production.up.railway.app/api/:path*"
     },
