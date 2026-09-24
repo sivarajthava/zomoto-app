@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Zomato AI • DineMind | AI-Powered Dining Discovery</title>
+  <title>DineMind • Midnight Epicure | AI-Powered Dining Discovery</title>
   
   <!-- Tailwind CSS CDN with configuration -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -194,7 +194,7 @@
               <span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white group-hover:text-coralNeon transition-colors">zomato</span>
               <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wider rounded bg-crimson/20 text-crimson border border-crimson/30 uppercase">AI</span>
             </div>
-            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wider uppercase -mt-0.5">DineMind Discovery</div>
+            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wider uppercase -mt-0.5">DineMind • Midnight Epicure</div>
           </div>
         </a>
 
@@ -826,13 +826,18 @@
 
     // API Base URL resolver: supports relative path (Vercel rewrites), window.API_BASE_URL, or ?api_url= parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const API_BASE = (window.API_BASE_URL || urlParams.get('api_url') || '').replace(/\/$/, '');
+    const RAILWAY_PROD_URL = 'https://zomoto-app-production.up.railway.app';
+    let API_BASE = (window.API_BASE_URL || urlParams.get('api_url') || '').replace(/\/$/, '');
 
     // 1. Health check & latency
     async function fetchHealth() {
       const start = performance.now();
       try {
-        const res = await fetch(`${API_BASE}/health`);
+        let res = await fetch(`${API_BASE}/health`);
+        if (!res.ok && !API_BASE && (window.location.hostname.includes('vercel.app') || window.location.protocol === 'file:')) {
+          API_BASE = RAILWAY_PROD_URL;
+          res = await fetch(`${API_BASE}/health`);
+        }
         const elapsed = Math.round(performance.now() - start);
         if (res.ok) {
           const data = await res.json();
@@ -842,6 +847,17 @@
           document.getElementById('backendStatusText').innerText = `API Online • ${data.records_loaded ? data.records_loaded.toLocaleString() + ' Restaurants' : 'Groq LPU'}`;
         }
       } catch (err) {
+        if (!API_BASE) {
+          try {
+            API_BASE = RAILWAY_PROD_URL;
+            const res = await fetch(`${API_BASE}/health`);
+            if (res.ok) {
+              const data = await res.json();
+              document.getElementById('backendStatusText').innerText = `API Online • ${data.records_loaded ? data.records_loaded.toLocaleString() + ' Restaurants' : 'Groq LPU'}`;
+              return;
+            }
+          } catch (e2) {}
+        }
         console.warn('Health check failed:', err);
         document.getElementById('backendStatusText').innerText = 'API Connecting...';
       }
@@ -850,13 +866,28 @@
     // 2. Fetch dataset metadata (localities & cuisines)
     async function fetchMetadata() {
       try {
-        const res = await fetch(`${API_BASE}/api/v1/metadata`);
+        let res = await fetch(`${API_BASE}/api/v1/metadata`);
+        if (!res.ok && !API_BASE) {
+          API_BASE = RAILWAY_PROD_URL;
+          res = await fetch(`${API_BASE}/api/v1/metadata`);
+        }
         if (res.ok) {
           const data = await res.json();
           populateLocalities(data.localities || []);
           populateCuisines(data.cuisines || []);
         }
       } catch (err) {
+        if (!API_BASE) {
+          try {
+            API_BASE = RAILWAY_PROD_URL;
+            const res = await fetch(`${API_BASE}/api/v1/metadata`);
+            if (res.ok) {
+              const data = await res.json();
+              populateLocalities(data.localities || []);
+              populateCuisines(data.cuisines || []);
+            }
+          } catch (e2) {}
+        }
         console.warn('Could not fetch metadata:', err);
       }
     }
@@ -946,11 +977,19 @@
 
       try {
         const startTime = performance.now();
-        const res = await fetch(`${API_BASE}/api/v1/recommendations`, {
+        let res = await fetch(`${API_BASE}/api/v1/recommendations`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        if (!res.ok && !API_BASE) {
+          API_BASE = RAILWAY_PROD_URL;
+          res = await fetch(`${API_BASE}/api/v1/recommendations`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
         const elapsed = Math.round(performance.now() - startTime);
         document.getElementById('latencyDisplay').innerText = `${elapsed}ms`;
 
@@ -961,6 +1000,21 @@
         const data = await res.json();
         renderResultsData(data);
       } catch (err) {
+        if (!API_BASE) {
+          try {
+            API_BASE = RAILWAY_PROD_URL;
+            const res = await fetch(`${API_BASE}/api/v1/recommendations`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+              const data = await res.json();
+              renderResultsData(data);
+              return;
+            }
+          } catch (e2) {}
+        }
         console.warn('Live API call failed, using graceful fallback:', err);
         renderGracefulFallback(query);
       } finally {
