@@ -2,7 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "cleanUrls": true,
- "public": true,
   "rewrites": [
     {
       "source": "/api/:path*",
@@ -22,11 +21,11 @@
     },
     {
       "source": "/",
-      "destination": "/app/static/index.html"
+      "destination": "/index.html"
     },
     {
       "source": "/app",
-      "destination": "/app/static/index.html"
+      "destination": "/index.html"
     },
     {
       "source": "/static/:path*",
