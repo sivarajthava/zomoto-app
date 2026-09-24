@@ -1,0 +1,16 @@
+.venv/
+.env
+.git/
+.github/
+.idea/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+tests/
+Sample-2/
+htmlcov/
+.coverage
+*.zip
+*.bat
+*.ps1

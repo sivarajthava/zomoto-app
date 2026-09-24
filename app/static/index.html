@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Zomato AI • DineMind | AI-Powered Dining Discovery</title>
+  
+  <!-- Tailwind CSS CDN with configuration -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#0B0F19',
+            slateBlack: '#0F172A',
+            charcoal: '#1E293B',
+            crimson: '#E23744',
+            coralNeon: '#FF5252',
+            gold: '#F59E0B',
+            emeraldMatch: '#10B981',
+            aiViolet: '#8B5CF6',
+            aiCyan: '#06B6D4',
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'glow-crimson': '0 0 25px -5px rgba(226, 55, 68, 0.45)',
+            'glow-violet': '0 0 25px -5px rgba(139, 92, 246, 0.4)',
+            'card-depth': '0 12px 36px 0 rgba(0, 0, 0, 0.35)',
+            'card-hover': '0 20px 45px -10px rgba(0, 0, 0, 0.45)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Dynamic Theme CSS Variables */
+    :root {
+      --bg-main: #F8FAFC;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --panel-bg: rgba(255, 255, 255, 0.9);
+      --panel-border: rgba(0, 0, 0, 0.08);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --input-bg: rgba(241, 245, 249, 0.95);
+      --input-border: rgba(0, 0, 0, 0.12);
+      --chip-bg: #F1F5F9;
+      --chip-text: #334155;
+      --chip-border: rgba(0, 0, 0, 0.08);
+      --summary-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(255, 255, 255, 0.95) 100%);
+      --summary-border: rgba(139, 92, 246, 0.3);
+      --rationale-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(241, 245, 249, 0.7) 100%);
+      --drawer-bg: rgba(255, 255, 255, 0.98);
+      --modal-bg: rgba(255, 255, 255, 0.98);
+      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      --track-bg: #F1F5F9;
+      --thumb-bg: #CBD5E1;
+    }
+
+    html.dark {
+      --bg-main: #0B0F19;
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+      --panel-bg: rgba(30, 41, 59, 0.72);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --card-bg: rgba(30, 41, 59, 0.65);
+      --input-bg: rgba(15, 23, 42, 0.85);
+      --input-border: rgba(255, 255, 255, 0.12);
+      --chip-bg: #0F172A;
+      --chip-text: #CBD5E1;
+      --chip-border: rgba(255, 255, 255, 0.1);
+      --summary-bg: linear-gradient(to right, rgba(139, 92, 246, 0.25), rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+      --summary-border: rgba(139, 92, 246, 0.35);
+      --rationale-bg: linear-gradient(to bottom right, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.05), transparent);
+      --drawer-bg: rgba(15, 23, 42, 0.96);
+      --modal-bg: rgba(30, 41, 59, 0.95);
+      --card-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45);
+      --track-bg: #0B0F19;
+      --thumb-bg: #273549;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--track-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--thumb-bg);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #E23744;
+    }
+
+    /* Glassmorphism Dynamic Classes */
+    .glass-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+    }
+    .glass-input {
+      background: var(--input-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--input-border);
+    }
+
+    /* Rank metallic badges */
+    .rank-gold {
+      background: linear-gradient(135deg, #FFE259 0%, #FFA751 100%);
+      color: #0F172A;
+      box-shadow: 0 4px 15px rgba(255, 175, 81, 0.4);
+    }
+    .rank-silver {
+      background: linear-gradient(135deg, #E0E7EF 0%, #94A3B8 100%);
+      color: #0F172A;
+      box-shadow: 0 4px 15px rgba(148, 163, 184, 0.35);
+    }
+    .rank-bronze {
+      background: linear-gradient(135deg, #F6D365 0%, #FDA085 100%);
+      color: #0F172A;
+      box-shadow: 0 4px 15px rgba(253, 160, 133, 0.35);
+    }
+    .rank-standard {
+      background: var(--chip-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--panel-border);
+    }
+
+    /* Shimmer effect for skeleton loading */
+    @keyframes shimmer {
+      100% {
+        transform: translateX(100%);
+      }
+    }
+    .shimmer-anim::after {
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      transform: translateX(-100%);
+      background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.08) 30%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.08) 70%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      animation: shimmer 1.8s infinite;
+      content: '';
+    }
+
+    /* Glow pulse for active AI engine */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+    }
+    .animate-pulse-dot {
+      animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="bg-[var(--bg-main)] text-[var(--text-main)] min-h-screen font-sans antialiased selection:bg-crimson selection:text-white pb-20 transition-colors duration-200">
+
+  <!-- ==================== 1. AppNavbar ==================== -->
+  <header class="sticky top-0 z-50 w-full glass-panel border-b border-[var(--panel-border)] transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between py-3">
+      
+      <!-- Left: Logo & Subtitle -->
+      <div class="flex items-center space-x-6">
+        <a class="flex items-center space-x-3 group" href="#">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-crimson to-coralNeon flex items-center justify-center shadow-glow-crimson group-hover:scale-105 transition-transform duration-200">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white group-hover:text-coralNeon transition-colors">zomato</span>
+              <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wider rounded bg-crimson/20 text-crimson border border-crimson/30 uppercase">AI</span>
+            </div>
+            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wider uppercase -mt-0.5">DineMind Discovery</div>
+          </div>
+        </a>
+
+        <!-- Location Selector Chip / Dropdown -->
+        <div class="relative hidden md:block">
+          <div class="flex items-center bg-[var(--chip-bg)] border border-[var(--chip-border)] hover:border-crimson/40 rounded-full px-3.5 py-1.5 transition-colors cursor-pointer group" id="locationSelectorBtn" onclick="toggleLocationDropdown()">
+            <i class="w-3.5 h-3.5 text-crimson mr-2" data-lucide="map-pin"></i>
+            <span class="text-xs font-semibold text-[var(--text-main)]" id="currentLocationDisplay">Indiranagar, Bangalore</span>
+            <i class="w-3 h-3 text-slate-400 ml-1.5 group-hover:text-crimson transition-colors" data-lucide="chevron-down"></i>
+          </div>
+
+          <!-- Dropdown menu -->
+          <div class="hidden absolute top-full mt-2 left-0 w-64 glass-panel rounded-xl shadow-2xl p-2 border border-[var(--panel-border)] z-50 max-h-60 overflow-y-auto" id="locationDropdown">
+            <div class="p-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-[var(--panel-border)] mb-1">
+              Select Bangalore Locality
+            </div>
+            <div id="locationList" class="space-y-0.5 text-xs">
+              <!-- Dynamically populated from /api/v1/metadata -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Backend Status Pill -->
+      <div class="hidden lg:flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="tracking-wide" id="backendStatusText">API Online • Groq LPU Powered</span>
+        <span class="text-[10px] text-emerald-700 dark:text-emerald-300 font-mono bg-emerald-500/20 px-1.5 rounded ml-1" id="latencyDisplay">~45ms</span>
+      </div>
+
+      <!-- Right Actions: Theme Toggle, Saved & External links -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Light / Dark Mode Toggle Button -->
+        <button class="p-2.5 rounded-xl bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-slate-800 text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] transition-all flex items-center space-x-1.5 group" id="themeToggleBtn" onclick="toggleTheme()" title="Switch Light / Dark Theme">
+          <i class="w-4 h-4 text-gold group-hover:scale-110 transition-transform" data-lucide="sun" id="themeIcon"></i>
+          <span class="hidden sm:inline text-xs font-semibold" id="themeLabel">Light</span>
+        </button>
+
+        <button class="relative p-2.5 rounded-xl bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-slate-800 text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] transition-all flex items-center space-x-2 group" id="savedBtn" onclick="toggleSavedDrawer()">
+          <i class="w-4 h-4 text-slate-400 group-hover:text-crimson transition-colors" data-lucide="bookmark"></i>
+          <span class="hidden sm:inline text-xs font-semibold">Saved (<span id="savedCount">0</span>)</span>
+        </button>
+
+        <a class="p-2.5 rounded-xl bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-slate-800 text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] transition-all flex items-center space-x-2" href="/docs" target="_blank" title="FastAPI Swagger Documentation">
+          <i class="w-4 h-4 text-aiViolet" data-lucide="code-2"></i>
+          <span class="hidden sm:inline text-xs font-semibold">API Docs</span>
+        </a>
+
+        <!-- Mobile Filter toggle button -->
+        <button class="lg:hidden p-2.5 rounded-xl bg-crimson/15 text-crimson border border-crimson/30 hover:bg-crimson/25 transition" onclick="toggleMobileFilters()">
+          <i class="w-4 h-4" data-lucide="sliders-horizontal"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== 2. ConversationalHero ==================== -->
+  <section class="relative pt-10 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+    <!-- Ambient backdrops -->
+    <div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-crimson/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+    <div class="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-aiViolet/15 rounded-full blur-[110px] pointer-events-none -z-10"></div>
+
+    <div class="text-center max-w-3xl mx-auto mb-6">
+      <div class="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-crimson/10 border border-crimson/30 text-crimson text-xs font-bold uppercase tracking-wider mb-4">
+        <i class="w-3.5 h-3.5" data-lucide="sparkles"></i>
+        <span>Generative Dining Intelligence</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+        Discover Dining Tailored to <br class="hidden sm:inline"/>
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-crimson via-coralNeon to-aiViolet">Your Taste &amp; Mood</span>
+      </h1>
+
+      <p class="mt-3 text-slate-600 dark:text-slate-400 text-sm sm:text-base font-normal max-w-xl mx-auto">
+        State your cravings, ambiance preferences, or dining party dynamics in plain English. DineMind synthesizes verified reviews, vibes, and curated menus in milliseconds.
+      </p>
+    </div>
+
+    <!-- Natural Language Search Box -->
+    <div class="max-w-4xl mx-auto">
+      <div class="relative rounded-2xl p-1.5 bg-gradient-to-r from-crimson/20 via-aiViolet/20 to-coralNeon/20 shadow-xl focus-within:ring-2 focus-within:ring-crimson focus-within:shadow-glow-crimson transition-all duration-300">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-[var(--card-bg)] rounded-xl px-4 py-2.5 sm:py-2 gap-3 border border-[var(--panel-border)]">
+          
+          <div class="flex items-center flex-1 space-x-3">
+            <i class="w-5 h-5 text-aiViolet animate-pulse shrink-0" data-lucide="sparkle"></i>
+            <input class="w-full bg-transparent border-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm sm:text-base focus:outline-none focus:ring-0" 
+                   id="naturalSearchInput" 
+                   onkeydown="if(event.key === 'Enter') handleSearchSubmit();" 
+                   placeholder="e.g., Cozy romantic rooftop with candle-lit seating, great Italian wine, under ₹1500..." 
+                   type="text" 
+                   value="Cozy romantic rooftop with candle-lit seating, great Italian wine, under ₹1500"/>
+          </div>
+
+          <div class="flex items-center justify-between sm:justify-end space-x-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--panel-border)]">
+            <button class="text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white px-2 py-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition" id="clearBtn" onclick="clearSearchInput()" title="Clear input">
+              Clear
+            </button>
+            <button class="flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-crimson to-coralNeon hover:from-coralNeon hover:to-crimson text-white font-bold text-sm shadow-glow-crimson hover:scale-105 active:scale-95 transition-all duration-200" id="askAiButton" onclick="handleSearchSubmit()">
+              <span>Ask AI</span>
+              <span class="text-base">🍽️</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Inspiration Quick-Chips Presets -->
+      <div class="mt-4 flex items-center flex-wrap gap-2 justify-center">
+        <span class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mr-1 flex items-center">
+          <i class="w-3.5 h-3.5 mr-1 text-gold" data-lucide="zap"></i> Quick Presets:
+        </span>
+        <button class="preset-chip px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-charcoal text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] hover:border-crimson/50 transition flex items-center space-x-1.5" onclick="applyPreset('romantic')">
+          <span>💑</span>
+          <span>Romantic Date Night</span>
+        </button>
+        <button class="preset-chip px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-charcoal text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] hover:border-crimson/50 transition flex items-center space-x-1.5" onclick="applyPreset('student')">
+          <span>🍕</span>
+          <span>Cheap Student Hangout</span>
+        </button>
+        <button class="preset-chip px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-charcoal text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] hover:border-crimson/50 transition flex items-center space-x-1.5" onclick="applyPreset('brunch')">
+          <span>👨‍👩‍👧</span>
+          <span>Sunday Family Brunch</span>
+        </button>
+        <button class="preset-chip px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-charcoal text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] hover:border-crimson/50 transition flex items-center space-x-1.5" onclick="applyPreset('latenight')">
+          <span>🌙</span>
+          <span>Late Night Quick Bites</span>
+        </button>
+        <button class="preset-chip px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-charcoal text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] hover:border-crimson/50 transition flex items-center space-x-1.5" onclick="applyPreset('vegan')">
+          <span>🥗</span>
+          <span>Vegan &amp; Organic</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MAIN CONTENT (Sidebar + Results) ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- ==================== 3. FilterPanel (Sticky Desktop & Drawer Mobile) ==================== -->
+      <aside class="hidden lg:block lg:col-span-3 sticky top-24 space-y-6" id="filterSidebar">
+        <div class="glass-panel rounded-2xl p-5 border border-[var(--panel-border)] shadow-card-depth space-y-6">
+          
+          <!-- Filter Header -->
+          <div class="flex items-center justify-between pb-3 border-b border-[var(--panel-border)]">
+            <div class="flex items-center space-x-2">
+              <i class="w-4 h-4 text-crimson" data-lucide="sliders-horizontal"></i>
+              <h2 class="text-sm font-bold tracking-wide uppercase text-slate-800 dark:text-slate-200">Refine Search</h2>
+            </div>
+            <button class="text-xs text-slate-500 hover:text-crimson font-medium transition" onclick="resetFilters()">Reset</button>
+          </div>
+
+          <!-- Dynamic Relaxation Alert (Visible when active) -->
+          <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 hidden items-start space-x-2 text-xs" id="relaxationAlert">
+            <i class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" data-lucide="alert-triangle"></i>
+            <div>
+              <span class="font-bold block">Relaxed Criteria Active</span>
+              <span class="text-amber-800/80 dark:text-amber-200/80" id="relaxationAlertText">Filters relaxed to expand candidates while maintaining high relevance.</span>
+            </div>
+          </div>
+
+          <!-- 1. Budget Tier Segmented Selector -->
+          <div class="space-y-2.5">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
+              <span>Budget Tier</span>
+              <span class="text-emeraldMatch text-[11px] font-semibold lowercase" id="activeBudgetLabel">medium tier</span>
+            </label>
+            <div class="grid grid-cols-3 gap-1.5 p-1 bg-[var(--input-bg)] rounded-xl border border-[var(--panel-border)]" id="budgetSegmentContainer">
+              <button class="budget-btn py-2 px-2 text-center rounded-lg text-xs font-semibold text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white transition" id="btn-budget" onclick="setBudgetTier('low')">
+                ₹ Budget<br/><span class="text-[9px] font-normal text-slate-400">≤ ₹500</span>
+              </button>
+              <button class="budget-btn py-2 px-2 text-center rounded-lg text-xs font-semibold bg-crimson text-white shadow-glow-crimson transition" id="btn-medium" onclick="setBudgetTier('medium')">
+                ₹₹ Medium<br/><span class="text-[9px] font-normal text-white/80">₹500 - 1.5k</span>
+              </button>
+              <button class="budget-btn py-2 px-2 text-center rounded-lg text-xs font-semibold text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white transition" id="btn-fine" onclick="setBudgetTier('high')">
+                ₹₹₹ Fine<br/><span class="text-[9px] font-normal text-slate-400">&gt; ₹1,500</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Cuisine Multi-Select Cloud -->
+          <div class="space-y-2.5">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
+              <span>Cuisine Cloud</span>
+              <span class="text-[10px] text-slate-500">Multi-select</span>
+            </label>
+            <div class="flex flex-wrap gap-1.5" id="cuisineTagsCloud">
+              <!-- Initial default tags; dynamically enhanced via metadata -->
+              <button class="cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-crimson text-white border border-crimson/50 flex items-center space-x-1" onclick="toggleCuisine(this, 'Italian')">
+                <i class="w-3 h-3" data-lucide="check"></i>
+                <span>Italian</span>
+              </button>
+              <button class="cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-crimson text-white border border-crimson/50 flex items-center space-x-1" onclick="toggleCuisine(this, 'Continental')">
+                <i class="w-3 h-3" data-lucide="check"></i>
+                <span>Continental</span>
+              </button>
+              <button class="cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--chip-bg)] text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] flex items-center space-x-1" onclick="toggleCuisine(this, 'North Indian')">
+                <span>North Indian</span>
+              </button>
+              <button class="cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--chip-bg)] text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] flex items-center space-x-1" onclick="toggleCuisine(this, 'Chinese')">
+                <span>Chinese</span>
+              </button>
+              <button class="cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--chip-bg)] text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] flex items-center space-x-1" onclick="toggleCuisine(this, 'Cafe')">
+                <span>Cafe</span>
+              </button>
+              <button class="cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--chip-bg)] text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] flex items-center space-x-1" onclick="toggleCuisine(this, 'Desserts')">
+                <span>Desserts</span>
+              </button>
+              <button class="cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--chip-bg)] text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] flex items-center space-x-1" onclick="toggleCuisine(this, 'Street Food')">
+                <span>Street Food</span>
+              </button>
+              <button class="cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--chip-bg)] text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] flex items-center space-x-1" onclick="toggleCuisine(this, 'Biryani')">
+                <span>Biryani</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Minimum Rating Slider -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between text-xs">
+              <label class="font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Min Rating</label>
+              <div class="flex items-center space-x-1 bg-gold/15 text-gold font-bold px-2 py-0.5 rounded-full border border-gold/30">
+                <i class="w-3 h-3 fill-gold text-gold" data-lucide="star"></i>
+                <span id="ratingDisplay">4.0★</span>
+              </div>
+            </div>
+            <input class="w-full h-1.5 bg-slate-300 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-crimson" 
+                   id="ratingRange" 
+                   max="4.8" 
+                   min="3.0" 
+                   oninput="handleRatingChange(this.value)" 
+                   step="0.1" 
+                   type="range" 
+                   value="4.0"/>
+            <div class="flex justify-between text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+              <span>3.0★</span>
+              <span>4.0★</span>
+              <span>4.8★</span>
+            </div>
+          </div>
+
+          <!-- Quick Filters: Vibe Toggles -->
+          <div class="space-y-2 pt-2 border-t border-[var(--panel-border)]">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Must Haves</span>
+            <div class="space-y-1.5 text-xs text-[var(--chip-text)]">
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-crimson">
+                <input checked="" class="rounded border-slate-400 dark:border-slate-600 text-crimson focus:ring-crimson bg-[var(--input-bg)]" id="vibe-rooftop" type="checkbox"/>
+                <span>Rooftop / Outdoor Seating</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-crimson">
+                <input checked="" class="rounded border-slate-400 dark:border-slate-600 text-crimson focus:ring-crimson bg-[var(--input-bg)]" id="vibe-wine" type="checkbox"/>
+                <span>Serves Wine &amp; Cocktails</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-crimson">
+                <input class="rounded border-slate-400 dark:border-slate-600 text-crimson focus:ring-crimson bg-[var(--input-bg)]" id="vibe-candle" type="checkbox"/>
+                <span>Candle-lit Ambience</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- AI Engine Spec Card -->
+        <div class="p-4 rounded-xl glass-panel border border-[var(--panel-border)] space-y-2 text-xs text-slate-500 dark:text-slate-400">
+          <div class="flex items-center justify-between text-slate-700 dark:text-slate-300 font-semibold">
+            <span class="flex items-center gap-1.5">
+              <i class="w-3.5 h-3.5 text-aiCyan" data-lucide="cpu"></i> LPU Model Architecture
+            </span>
+            <span class="text-emeraldMatch text-[10px] font-mono" id="modelSpecPill">openai/gpt-oss-120b</span>
+          </div>
+          <p class="text-[11px] leading-relaxed">
+            Semantic vector embeddings mapped via cosine similarity over verified Zomato customer sentiment tokens.
+          </p>
+        </div>
+      </aside>
+
+      <!-- ==================== 4. Results Area (Banner + Grid) ==================== -->
+      <section class="lg:col-span-9 space-y-6">
+        
+        <!-- ==================== 4. AISummaryBanner ==================== -->
+        <div class="p-5 rounded-2xl border shadow-card-depth relative overflow-hidden transition-all duration-300" id="aiSummaryBanner" style="background: var(--summary-bg); border-color: var(--summary-border);">
+          <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-aiViolet/15 rounded-full blur-3xl pointer-events-none"></div>
+          
+          <div class="flex items-start space-x-4">
+            <div class="w-10 h-10 rounded-xl bg-aiViolet/20 border border-aiViolet/40 flex items-center justify-center shrink-0 shadow-glow-violet">
+              <i class="w-5 h-5 text-aiViolet" data-lucide="sparkles"></i>
+            </div>
+            
+            <div class="flex-1 space-y-1.5">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white tracking-wide flex items-center gap-1.5">
+                    AI DineMind Synthesized Analysis
+                  </h3>
+                  <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-aiViolet/20 text-purple-700 dark:text-purple-200 border border-aiViolet/30">
+                    Confidence: 98.4%
+                  </span>
+                </div>
+                
+                <!-- Fallback Indicator -->
+                <div class="flex items-center space-x-1.5 text-[11px] text-slate-500 dark:text-slate-400 bg-[var(--input-bg)] px-2.5 py-1 rounded-md border border-[var(--panel-border)]" id="fallbackPill">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500" id="fallbackDot"></span>
+                  <span id="fallbackText">Live Groq Inference</span>
+                </div>
+              </div>
+
+              <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed" id="summaryText">
+                Synthesizing curated restaurant matches tailored to your taste, mood, and budget preferences across Bangalore...
+              </p>
+
+              <!-- Dynamic Trade-off badges -->
+              <div class="flex items-center flex-wrap gap-2 pt-1 text-[11px]" id="tradeoffBadges">
+                <span class="text-slate-500 dark:text-slate-400">Key Highlights:</span>
+                <span class="px-2 py-0.5 rounded bg-emeraldMatch/10 text-emeraldMatch border border-emeraldMatch/25">Ambiance: Verified Mood</span>
+                <span class="px-2 py-0.5 rounded bg-gold/10 text-gold border border-gold/25">Pricing: Exact Match</span>
+                <span class="px-2 py-0.5 rounded bg-aiCyan/10 text-aiCyan border border-aiCyan/25">Grounded: Zomato Verified</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result Controls Bar -->
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
+          <div class="flex items-center space-x-2">
+            <span class="font-semibold text-slate-800 dark:text-slate-200" id="resultsCount">Showing Recommendations</span>
+            <span class="text-slate-400">•</span>
+            <span>Sorted by AI Relevance Score</span>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <label class="hidden sm:inline text-slate-500 dark:text-slate-400">View Mode:</label>
+            <div class="flex bg-[var(--input-bg)] p-0.5 rounded-lg border border-[var(--panel-border)]">
+              <button class="p-1 rounded bg-[var(--chip-bg)] text-[var(--text-main)] hover:text-crimson" id="btnGrid3" onclick="setGridCols(3)" title="3 Column Grid">
+                <i class="w-3.5 h-3.5" data-lucide="grid"></i>
+              </button>
+              <button class="p-1 rounded text-slate-400 hover:text-[var(--text-main)]" id="btnGrid2" onclick="setGridCols(2)" title="2 Column Grid">
+                <i class="w-3.5 h-3.5" data-lucide="columns"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== 5. LoadingSkeleton ==================== -->
+        <div class="hidden grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="loadingSkeletonGrid">
+          <div class="glass-panel rounded-2xl p-5 border border-[var(--panel-border)] relative overflow-hidden shimmer-anim space-y-4">
+            <div class="h-44 bg-slate-200 dark:bg-slate-800/60 rounded-xl"></div>
+            <div class="h-5 bg-slate-200 dark:bg-slate-800/60 rounded w-3/4"></div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800/40 rounded w-1/2"></div>
+            <div class="h-16 bg-slate-200 dark:bg-slate-800/50 rounded-xl"></div>
+            <div class="h-10 bg-slate-200 dark:bg-slate-800/60 rounded-xl"></div>
+          </div>
+          <div class="glass-panel rounded-2xl p-5 border border-[var(--panel-border)] relative overflow-hidden shimmer-anim space-y-4">
+            <div class="h-44 bg-slate-200 dark:bg-slate-800/60 rounded-xl"></div>
+            <div class="h-5 bg-slate-200 dark:bg-slate-800/60 rounded w-3/4"></div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800/40 rounded w-1/2"></div>
+            <div class="h-16 bg-slate-200 dark:bg-slate-800/50 rounded-xl"></div>
+            <div class="h-10 bg-slate-200 dark:bg-slate-800/60 rounded-xl"></div>
+          </div>
+          <div class="glass-panel rounded-2xl p-5 border border-[var(--panel-border)] relative overflow-hidden shimmer-anim space-y-4">
+            <div class="h-44 bg-slate-200 dark:bg-slate-800/60 rounded-xl"></div>
+            <div class="h-5 bg-slate-200 dark:bg-slate-800/60 rounded w-3/4"></div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800/40 rounded w-1/2"></div>
+            <div class="h-16 bg-slate-200 dark:bg-slate-800/50 rounded-xl"></div>
+            <div class="h-10 bg-slate-200 dark:bg-slate-800/60 rounded-xl"></div>
+          </div>
+        </div>
+
+        <!-- ==================== 6. RestaurantCard Grid Container ==================== -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 transition-all duration-300" id="restaurantCardsContainer">
+          <!-- Cards dynamically rendered here -->
+        </div>
+
+        <!-- ==================== 7. EmptyState (Shown when 0 matches) ==================== -->
+        <div class="hidden p-12 glass-panel rounded-2xl border border-[var(--panel-border)] text-center max-w-lg mx-auto space-y-4" id="emptyStateContainer">
+          <div class="w-16 h-16 mx-auto rounded-full bg-[var(--chip-bg)] flex items-center justify-center border border-[var(--panel-border)] text-crimson">
+            <i class="w-8 h-8" data-lucide="compass"></i>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-slate-900 dark:text-white">No exact matches in this locality</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Your combination of strict price tiers and high rating produced 0 candidates.</p>
+          </div>
+          <button class="px-5 py-2.5 rounded-xl bg-crimson hover:bg-coralNeon text-white text-xs font-bold transition shadow-glow-crimson inline-flex items-center space-x-2" onclick="resetAndRelaxFilters()">
+            <i class="w-3.5 h-3.5" data-lucide="refresh-cw"></i>
+            <span>Relax Filters to 3.8★ &amp; Nearby Localities</span>
+          </button>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- ==================== Modals & Drawers ==================== -->
+
+  <!-- Reservation Modal -->
+  <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden items-center justify-center p-4" id="reservationModal">
+    <div class="glass-panel max-w-md w-full rounded-2xl p-6 border border-[var(--panel-border)] shadow-2xl relative space-y-4 animate-in fade-in duration-200" style="background: var(--modal-bg);">
+      <button class="absolute top-4 right-4 text-slate-400 hover:text-crimson p-1" onclick="closeReservationModal()">
+        <i class="w-5 h-5" data-lucide="x"></i>
+      </button>
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson">
+          <i class="w-5 h-5" data-lucide="utensils"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white" id="modalRestaurantName">Restaurant Name</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Instant AI Table Reservation Confirmation</p>
+        </div>
+      </div>
+      <div class="space-y-3 text-xs pt-2">
+        <div>
+          <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Guests</label>
+          <div class="grid grid-cols-4 gap-2">
+            <button class="py-2 rounded-lg bg-crimson text-white font-bold guest-btn">2 Guests</button>
+            <button class="py-2 rounded-lg bg-[var(--chip-bg)] text-[var(--chip-text)] hover:bg-slate-200 dark:hover:bg-slate-800 guest-btn">4 Guests</button>
+            <button class="py-2 rounded-lg bg-[var(--chip-bg)] text-[var(--chip-text)] hover:bg-slate-200 dark:hover:bg-slate-800 guest-btn">6 Guests</button>
+            <button class="py-2 rounded-lg bg-[var(--chip-bg)] text-[var(--chip-text)] hover:bg-slate-200 dark:hover:bg-slate-800 guest-btn">8+ Large</button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Dining Slot (Tonight)</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="py-2 rounded-lg bg-[var(--chip-bg)] text-[var(--chip-text)] hover:bg-slate-200 dark:hover:bg-slate-800 time-btn">7:30 PM</button>
+            <button class="py-2 rounded-lg bg-crimson text-white font-bold shadow-glow-crimson time-btn">8:15 PM (Prime)</button>
+            <button class="py-2 rounded-lg bg-[var(--chip-bg)] text-[var(--chip-text)] hover:bg-slate-200 dark:hover:bg-slate-800 time-btn">9:30 PM</button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Seating Preference</label>
+          <select class="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-lg p-2.5 text-slate-900 dark:text-slate-200 text-xs focus:ring-1 focus:ring-crimson">
+            <option>Candle-lit Rooftop / Terrace (AI Picked)</option>
+            <option>Quiet Indoor AC Section</option>
+            <option>Garden Arbor Booth</option>
+          </select>
+        </div>
+      </div>
+      <div class="pt-3 border-t border-[var(--panel-border)]">
+        <button class="w-full py-3 rounded-xl bg-gradient-to-r from-crimson to-coralNeon text-white font-bold text-xs tracking-wide shadow-glow-crimson hover:scale-[1.02] active:scale-95 transition" id="confirmBookBtn" onclick="confirmBooking()">
+          Confirm Reservation • Free Instant Confirmation
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu Preview Modal -->
+  <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden items-center justify-center p-4" id="menuModal">
+    <div class="glass-panel max-w-lg w-full rounded-2xl p-6 border border-[var(--panel-border)] shadow-2xl relative space-y-4" style="background: var(--modal-bg);">
+      <button class="absolute top-4 right-4 text-slate-400 hover:text-crimson p-1" onclick="closeMenuModal()">
+        <i class="w-5 h-5" data-lucide="x"></i>
+      </button>
+      <div>
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2" id="menuModalTitle">
+          <span>Chef Specials</span>
+          <span class="text-[10px] px-2 py-0.5 bg-crimson/20 text-crimson font-bold rounded">AI Highlighted</span>
+        </h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400" id="menuModalSubtitle">Curated dishes matching your taste query</p>
+      </div>
+      <div class="divide-y divide-[var(--panel-border)] max-h-80 overflow-y-auto pr-1 text-xs space-y-3" id="menuModalItems">
+        <!-- Dynamically rendered -->
+      </div>
+      <div class="pt-2">
+        <button class="w-full py-2.5 rounded-xl bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-slate-800 text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white text-xs font-semibold border border-[var(--chip-border)] transition" onclick="closeMenuModal()">
+          Close Menu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved Drawer -->
+  <div class="fixed inset-y-0 right-0 max-w-sm w-full border-l border-[var(--panel-border)] z-50 p-6 transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between" id="savedDrawer" style="background: var(--drawer-bg);">
+    <div class="space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[var(--panel-border)]">
+        <div class="flex items-center space-x-2">
+          <i class="w-5 h-5 text-crimson" data-lucide="bookmark"></i>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Saved Recommendations</h3>
+        </div>
+        <button class="text-slate-400 hover:text-crimson p-1" onclick="toggleSavedDrawer()">
+          <i class="w-5 h-5" data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="space-y-3 max-h-[70vh] overflow-y-auto pr-1" id="savedListContainer">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+    <div>
+      <button class="w-full py-2.5 rounded-xl bg-crimson hover:bg-coralNeon text-white text-xs font-bold transition" onclick="toggleSavedDrawer()">
+        Done
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none" id="toastNotification">
+    <div class="px-4 py-3 rounded-xl bg-[var(--card-bg)] border border-emeraldMatch/40 text-slate-900 dark:text-white text-xs font-semibold shadow-2xl flex items-center space-x-2">
+      <i class="w-4 h-4 text-emeraldMatch" data-lucide="check-circle"></i>
+      <span id="toastMessage">Notification message</span>
+    </div>
+  </div>
+
+  <!-- Mobile Drawer for Filters -->
+  <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden flex-col justify-end lg:hidden" id="mobileFilterDrawer">
+    <div class="glass-panel w-full rounded-t-3xl p-6 border-t border-[var(--panel-border)] max-h-[85vh] overflow-y-auto space-y-6" style="background: var(--modal-bg);">
+      <div class="flex items-center justify-between pb-2 border-b border-[var(--panel-border)]">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="w-4 h-4 text-crimson" data-lucide="sliders-horizontal"></i> Filter Preferences
+        </h3>
+        <button class="text-slate-400 hover:text-crimson p-1" onclick="toggleMobileFilters()">
+          <i class="w-5 h-5" data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="space-y-2">
+        <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Budget Tier</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button class="py-2.5 px-2 bg-[var(--chip-bg)] rounded-lg text-xs font-semibold text-[var(--chip-text)]" onclick="setBudgetTier('low'); toggleMobileFilters();">₹ Budget</button>
+          <button class="py-2.5 px-2 bg-crimson text-white rounded-lg text-xs font-semibold" onclick="setBudgetTier('medium'); toggleMobileFilters();">₹₹ Medium</button>
+          <button class="py-2.5 px-2 bg-[var(--chip-bg)] rounded-lg text-xs font-semibold text-[var(--chip-text)]" onclick="setBudgetTier('high'); toggleMobileFilters();">₹₹₹ Fine</button>
+        </div>
+      </div>
+      <button class="w-full py-3 bg-crimson text-white font-bold rounded-xl text-xs uppercase tracking-wider" onclick="toggleMobileFilters(); handleSearchSubmit();">
+        Apply &amp; Show Results
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== APPLICATION SCRIPTS & LIVE API BINDING ==================== -->
+  <script>
+    // State Variables
+    let currentLocation = 'Indiranagar';
+    let currentBudgetTier = 'medium'; // 'low', 'medium', 'high'
+    let selectedCuisines = ['Italian', 'Continental'];
+    let currentMinRating = 4.0;
+    let savedRestaurants = [];
+    let activeRecommendations = [];
+
+    // Fallback Curated Imagery by Cuisine
+    const cuisineImages = {
+      'italian': [
+        'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=700&q=80',
+        'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=700&q=80',
+        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=700&q=80'
+      ],
+      'burger': [
+        'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=700&q=80',
+        'https://images.unsplash.com/photo-1527477378739-166e4a28292f?auto=format&fit=crop&w=700&q=80'
+      ],
+      'cafe': [
+        'https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=700&q=80',
+        'https://images.unsplash.com/photo-1525610553991-2bede1a236e2?auto=format&fit=crop&w=700&q=80'
+      ],
+      'indian': [
+        'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=700&q=80',
+        'https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=700&q=80'
+      ],
+      'vegan': [
+        'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=700&q=80',
+        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=700&q=80'
+      ],
+      'continental': [
+        'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=700&q=80',
+        'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=700&q=80'
+      ],
+      'chinese': [
+        'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=700&q=80',
+        'https://images.unsplash.com/photo-1526318897995-17583a351be5?auto=format&fit=crop&w=700&q=80'
+      ]
+    };
+
+    function getImageForRestaurant(cuisine, index) {
+      const lower = (cuisine || '').toLowerCase();
+      let pool = cuisineImages.continental;
+      if (lower.includes('italian') || lower.includes('pizza')) pool = cuisineImages.italian;
+      else if (lower.includes('burger') || lower.includes('fast food')) pool = cuisineImages.burger;
+      else if (lower.includes('cafe') || lower.includes('dessert')) pool = cuisineImages.cafe;
+      else if (lower.includes('indian') || lower.includes('biryani')) pool = cuisineImages.indian;
+      else if (lower.includes('vegan') || lower.includes('healthy') || lower.includes('salad')) pool = cuisineImages.vegan;
+      else if (lower.includes('chinese') || lower.includes('asian')) pool = cuisineImages.chinese;
+
+      return pool[index % pool.length];
+    }
+
+    // --- Theme Management (Light / Dark Mode) ---
+    function initTheme() {
+      const savedTheme = localStorage.getItem('dinemind_theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      applyTheme(theme);
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
+      applyTheme(newTheme);
+      localStorage.setItem('dinemind_theme', newTheme);
+      showToast(`Switched to ${newTheme === 'dark' ? 'Dark' : 'Light'} Mode`);
+    }
+
+    function applyTheme(theme) {
+      const icon = document.getElementById('themeIcon');
+      const label = document.getElementById('themeLabel');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        if (icon) {
+          icon.setAttribute('data-lucide', 'sun');
+          icon.className = 'w-4 h-4 text-gold group-hover:scale-110 transition-transform';
+        }
+        if (label) label.innerText = 'Light';
+      } else {
+        document.documentElement.classList.remove('dark');
+        if (icon) {
+          icon.setAttribute('data-lucide', 'moon');
+          icon.className = 'w-4 h-4 text-aiViolet group-hover:scale-110 transition-transform';
+        }
+        if (label) label.innerText = 'Dark';
+      }
+      lucide.createIcons();
+    }
+
+    // Initialize on Load
+    document.addEventListener('DOMContentLoaded', async () => {
+      initTheme();
+      await fetchHealth();
+      await fetchMetadata();
+      // Trigger initial search with default query
+      handleSearchSubmit();
+    });
+
+    // API Base URL resolver: supports relative path (Vercel rewrites), window.API_BASE_URL, or ?api_url= parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const API_BASE = (window.API_BASE_URL || urlParams.get('api_url') || '').replace(/\/$/, '');
+
+    // 1. Health check & latency
+    async function fetchHealth() {
+      const start = performance.now();
+      try {
+        const res = await fetch(`${API_BASE}/health`);
+        const elapsed = Math.round(performance.now() - start);
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('latencyDisplay').innerText = `${elapsed}ms latency`;
+          const modelName = data.model || 'openai/gpt-oss-120b';
+          document.getElementById('modelSpecPill').innerText = modelName;
+          document.getElementById('backendStatusText').innerText = `API Online • ${data.records_loaded ? data.records_loaded.toLocaleString() + ' Restaurants' : 'Groq LPU'}`;
+        }
+      } catch (err) {
+        console.warn('Health check failed:', err);
+        document.getElementById('backendStatusText').innerText = 'API Connecting...';
+      }
+    }
+
+    // 2. Fetch dataset metadata (localities & cuisines)
+    async function fetchMetadata() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/metadata`);
+        if (res.ok) {
+          const data = await res.json();
+          populateLocalities(data.localities || []);
+          populateCuisines(data.cuisines || []);
+        }
+      } catch (err) {
+        console.warn('Could not fetch metadata:', err);
+      }
+    }
+
+    function populateLocalities(localities) {
+      const defaultList = ['Indiranagar', 'Koramangala', 'HSR', 'Whitefield', 'Jayanagar', 'Church Street', 'JP Nagar', 'Brigade Road', 'BTM', 'Malleshwaram'];
+      const merged = Array.from(new Set([...defaultList, ...localities])).slice(0, 25);
+      
+      const container = document.getElementById('locationList');
+      if (!container) return;
+      container.innerHTML = merged.map(loc => `
+        <div class="px-2.5 py-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer flex items-center justify-between text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white transition"
+             onclick="selectLocality('${loc}')">
+          <span>${loc}</span>
+          ${loc === currentLocation ? '<i data-lucide="check" class="w-3.5 h-3.5 text-crimson"></i>' : ''}
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function toggleLocationDropdown() {
+      const dd = document.getElementById('locationDropdown');
+      dd.classList.toggle('hidden');
+    }
+
+    function selectLocality(loc) {
+      currentLocation = loc;
+      document.getElementById('currentLocationDisplay').innerText = `${loc}, Bangalore`;
+      toggleLocationDropdown();
+      // Re-render checkmarks in dropdown
+      const items = document.querySelectorAll('#locationList > div');
+      items.forEach(el => {
+        const name = el.querySelector('span')?.innerText;
+        if (name === loc) {
+          el.innerHTML = `<span>${name}</span><i data-lucide="check" class="w-3.5 h-3.5 text-crimson"></i>`;
+        } else {
+          el.innerHTML = `<span>${name}</span>`;
+        }
+      });
+      lucide.createIcons();
+      handleSearchSubmit();
+    }
+
+    function populateCuisines(cuisines) {
+      if (!cuisines || cuisines.length === 0) return;
+      const topCuisines = ['Italian', 'Continental', 'North Indian', 'Chinese', 'Cafe', 'Desserts', 'Street Food', 'Biryani', 'Asian', 'Fast Food', 'Healthy Food', 'Pizza', 'Mughlai'];
+      const container = document.getElementById('cuisineTagsCloud');
+      if (!container) return;
+
+      container.innerHTML = topCuisines.map(c => {
+        const isSelected = selectedCuisines.includes(c);
+        const btnClass = isSelected 
+          ? "cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-crimson text-white border border-crimson/50 flex items-center space-x-1"
+          : "cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--chip-bg)] text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] flex items-center space-x-1";
+        const icon = isSelected ? '<i data-lucide="check" class="w-3 h-3"></i>' : '';
+        return `
+          <button class="${btnClass}" onclick="toggleCuisine(this, '${c}')">
+            ${icon}
+            <span>${c}</span>
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // 3. Search & Recommendation Execution
+    async function handleSearchSubmit() {
+      const query = document.getElementById('naturalSearchInput').value.trim();
+      const skeleton = document.getElementById('loadingSkeletonGrid');
+      const container = document.getElementById('restaurantCardsContainer');
+      const emptyState = document.getElementById('emptyStateContainer');
+      const askBtn = document.getElementById('askAiButton');
+
+      // Visual feedback
+      askBtn.innerHTML = `<span>Thinking...</span><span class="animate-spin">🌀</span>`;
+      container.classList.add('hidden');
+      emptyState.classList.add('hidden');
+      skeleton.classList.remove('hidden');
+
+      const payload = {
+        location: currentLocation,
+        budget_tier: currentBudgetTier,
+        cuisines: selectedCuisines,
+        min_rating: currentMinRating,
+        additional_preferences: query || undefined
+      };
+
+      try {
+        const startTime = performance.now();
+        const res = await fetch(`${API_BASE}/api/v1/recommendations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const elapsed = Math.round(performance.now() - startTime);
+        document.getElementById('latencyDisplay').innerText = `${elapsed}ms`;
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        renderResultsData(data);
+      } catch (err) {
+        console.warn('Live API call failed, using graceful fallback:', err);
+        renderGracefulFallback(query);
+      } finally {
+        askBtn.innerHTML = `<span>Ask AI</span><span class="text-base">🍽️</span>`;
+        skeleton.classList.add('hidden');
+        container.classList.remove('hidden');
+        document.getElementById('aiSummaryBanner').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function renderResultsData(data) {
+      activeRecommendations = data.recommendations || [];
+
+      // Update Summary Text
+      document.getElementById('summaryText').innerHTML = data.summary || "Here are the top AI-curated restaurant recommendations based on your preferences.";
+
+      // Fallback Pill
+      const fallbackPill = document.getElementById('fallbackPill');
+      const fallbackDot = document.getElementById('fallbackDot');
+      const fallbackText = document.getElementById('fallbackText');
+      if (data.is_fallback) {
+        fallbackDot.className = "w-1.5 h-1.5 rounded-full bg-amber-500";
+        fallbackText.innerText = "Deterministic Fallback Engine";
+      } else {
+        fallbackDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500";
+        fallbackText.innerText = "Live Groq Inference";
+      }
+
+      // Relaxation Alert
+      const relaxAlert = document.getElementById('relaxationAlert');
+      if (data.relaxed_criteria) {
+        relaxAlert.classList.remove('hidden');
+        relaxAlert.classList.add('flex');
+      } else {
+        relaxAlert.classList.add('hidden');
+        relaxAlert.classList.remove('flex');
+      }
+
+      // Check if results are empty
+      if (!activeRecommendations.length) {
+        showEmptyState();
+        return;
+      }
+
+      const container = document.getElementById('restaurantCardsContainer');
+      document.getElementById('resultsCount').innerText = `Showing ${activeRecommendations.length} Curated Recommendations`;
+
+      let html = '';
+      activeRecommendations.forEach((item, index) => {
+        let rankClass = 'rank-standard';
+        if (item.rank === 1) rankClass = 'rank-gold';
+        else if (item.rank === 2) rankClass = 'rank-silver';
+        else if (item.rank === 3) rankClass = 'rank-bronze';
+
+        const isFav = savedRestaurants.includes(item.restaurant_name);
+        const heartClass = isFav ? 'fill-crimson text-crimson' : 'text-slate-300';
+        const imgUrl = getImageForRestaurant(item.cuisine, index);
+        const matchScore = Math.max(88, 99 - (index * 3));
+
+        html += `
+          <div class="restaurant-card group glass-panel rounded-2xl p-5 border border-[var(--panel-border)] hover:border-crimson/50 hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between relative hover:-translate-y-1">
+            
+            <div class="relative w-full h-44 rounded-xl overflow-hidden mb-4 bg-slate-900">
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" 
+                   style="background-image: url('${imgUrl}');">
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+
+              <div class="absolute top-3 left-3 ${rankClass} px-2.5 py-1 rounded-lg text-xs font-black tracking-wider flex items-center space-x-1">
+                <span>#${item.rank} MATCH</span>
+              </div>
+
+              <button onclick="toggleFavorite(this, '${escapeHtml(item.restaurant_name)}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:text-crimson transition">
+                <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>
+              </button>
+
+              <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+                <div>
+                  <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-black/70 text-emeraldMatch border border-emeraldMatch/30">
+                    ${matchScore}% Match Score
+                  </span>
+                </div>
+                <div class="flex items-center space-x-1.5 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-gold/40">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-gold text-gold"></i>
+                  <span class="text-xs font-bold text-white">${parseFloat(item.rating).toFixed(1)}</span>
+                  <span class="text-[10px] text-slate-300 font-mono">(Zomato Verified)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <div>
+                <div class="flex items-baseline justify-between">
+                  <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-coralNeon transition-colors">${escapeHtml(item.restaurant_name)}</h3>
+                  <span class="text-xs font-semibold text-emeraldMatch capitalize">${currentBudgetTier} Tier</span>
+                </div>
+                <div class="flex items-center space-x-1 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-crimson"></i>
+                  <span>${currentLocation}, Bangalore</span>
+                </div>
+              </div>
+
+              <div class="flex items-center flex-wrap gap-1.5 text-[11px]">
+                <span class="px-2 py-0.5 rounded-md bg-[var(--chip-bg)] text-[var(--chip-text)] border border-[var(--chip-border)] font-medium">${escapeHtml(item.cuisine)}</span>
+                <span class="px-2 py-0.5 rounded-md bg-emeraldMatch/10 text-emeraldMatch border border-emeraldMatch/25 font-semibold">₹${Math.round(item.estimated_cost_for_two)} for two</span>
+              </div>
+
+              <div class="p-3.5 rounded-xl border-l-2 border-aiViolet text-xs space-y-1.5" style="background: var(--rationale-bg);">
+                <div class="flex items-center space-x-1.5 text-aiViolet font-bold text-[11px] uppercase tracking-wider">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                  <span>Why AI Picked This For You</span>
+                </div>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                  "${escapeHtml(item.explanation)}"
+                </p>
+              </div>
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-[var(--panel-border)] grid grid-cols-2 gap-2">
+              <button onclick="openMenuModal('${escapeHtml(item.restaurant_name)}', '${escapeHtml(item.cuisine)}')" class="px-3 py-2 rounded-xl bg-[var(--chip-bg)] hover:bg-slate-200 dark:hover:bg-slate-800 text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] text-xs font-semibold transition flex items-center justify-center space-x-1.5">
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>View Menu</span>
+              </button>
+              <button onclick="openReservationModal('${escapeHtml(item.restaurant_name)}')" class="px-3 py-2 rounded-xl bg-crimson hover:bg-coralNeon text-white text-xs font-bold transition shadow-glow-crimson flex items-center justify-center space-x-1.5">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                <span>Reserve Table</span>
+              </button>
+            </div>
+
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    // Graceful offline fallback
+    function renderGracefulFallback(query) {
+      const fallbackData = {
+        summary: `AI analyzed restaurants in <strong>${currentLocation}</strong> matching "${query || 'top rated places'}". Curated selections balance verified diner reviews, authentic flavors, and targeted price points.`,
+        is_fallback: true,
+        relaxed_criteria: false,
+        recommendations: [
+          {
+            rank: 1,
+            restaurant_name: "Chianti Ristorante & Wine Bar",
+            cuisine: "Italian • Wine Bar",
+            rating: 4.8,
+            estimated_cost_for_two: 1400,
+            explanation: "Exceeds the dining brief with candle-lit veranda tables under lush canopy. Handcrafted pasta paired with imported Tuscan reds fits within the budget without compromise."
+          },
+          {
+            rank: 2,
+            restaurant_name: "Toit Brewpub & Bistro",
+            cuisine: "Continental • Craft Beer",
+            rating: 4.7,
+            estimated_cost_for_two: 1500,
+            explanation: "Lively rooftop terrace with warm ambient lighting. Their authentic woodfired Neapolitan crusts and house brews fit right into weekend dining."
+          },
+          {
+            rank: 3,
+            restaurant_name: "Brik Oven & Sourdough Co.",
+            cuisine: "Italian • Pizzeria",
+            rating: 4.6,
+            estimated_cost_for_two: 1200,
+            explanation: "Most pocket-friendly Italian option without sacrificing quality. Ranked highest for authentic fermented dough and quiet courtyard tables."
+          }
+        ]
+      };
+      renderResultsData(fallbackData);
+    }
+
+    function applyPreset(presetKey) {
+      const input = document.getElementById('naturalSearchInput');
+      
+      const promptMap = {
+        romantic: {
+          text: "Cozy romantic rooftop with candle-lit seating, great Italian wine, under ₹1500",
+          tier: "medium",
+          cuisines: ["Italian", "Continental"]
+        },
+        student: {
+          text: "Cheap student hangout with loaded burgers, fast WiFi, casual vibe, under ₹500",
+          tier: "low",
+          cuisines: ["Fast Food", "Street Food", "Cafe"]
+        },
+        brunch: {
+          text: "Lush Sunday family brunch with spacious outdoor garden, waffles, and live acoustic music",
+          tier: "high",
+          cuisines: ["Continental", "Cafe", "Desserts"]
+        },
+        latenight: {
+          text: "Late night quick bites after midnight with hot kebabs or cheesy burgers",
+          tier: "low",
+          cuisines: ["Street Food", "Fast Food", "North Indian"]
+        },
+        vegan: {
+          text: "Organic 100% plant-based cafe with fresh salads, cold-pressed smoothies, and peaceful green vibes",
+          tier: "medium",
+          cuisines: ["Healthy Food", "Cafe"]
+        }
+      };
+
+      const preset = promptMap[presetKey];
+      if (!preset) return;
+
+      input.value = preset.text;
+      setBudgetTierVisual(preset.tier);
+      currentBudgetTier = preset.tier;
+      selectedCuisines = preset.cuisines;
+      
+      // Update cuisine chips
+      const chips = document.querySelectorAll('.cuisine-chip');
+      chips.forEach(chip => {
+        const name = chip.querySelector('span')?.innerText;
+        if (selectedCuisines.includes(name)) {
+          chip.className = "cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-crimson text-white border border-crimson/50 flex items-center space-x-1";
+          chip.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i><span>${name}</span>`;
+        } else {
+          chip.className = "cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--chip-bg)] text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] flex items-center space-x-1";
+          chip.innerHTML = `<span>${name}</span>`;
+        }
+      });
+      lucide.createIcons();
+
+      handleSearchSubmit();
+    }
+
+    function setBudgetTier(tier) {
+      currentBudgetTier = tier;
+      setBudgetTierVisual(tier);
+      handleSearchSubmit();
+    }
+
+    function setBudgetTierVisual(tier) {
+      const btnBudget = document.getElementById('btn-budget');
+      const btnMedium = document.getElementById('btn-medium');
+      const btnFine = document.getElementById('btn-fine');
+      const label = document.getElementById('activeBudgetLabel');
+
+      [btnBudget, btnMedium, btnFine].forEach(b => {
+        b.className = "budget-btn py-2 px-2 text-center rounded-lg text-xs font-semibold text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white transition";
+      });
+
+      if (tier === 'low') {
+        btnBudget.className = "budget-btn py-2 px-2 text-center rounded-lg text-xs font-semibold bg-crimson text-white shadow-glow-crimson transition";
+        label.innerText = "budget (≤ ₹500)";
+      } else if (tier === 'medium') {
+        btnMedium.className = "budget-btn py-2 px-2 text-center rounded-lg text-xs font-semibold bg-crimson text-white shadow-glow-crimson transition";
+        label.innerText = "medium tier (₹500 - 1.5k)";
+      } else if (tier === 'high') {
+        btnFine.className = "budget-btn py-2 px-2 text-center rounded-lg text-xs font-semibold bg-crimson text-white shadow-glow-crimson transition";
+        label.innerText = "fine dining (> ₹1,500)";
+      }
+    }
+
+    function toggleCuisine(element, cuisineName) {
+      const isSelected = selectedCuisines.includes(cuisineName);
+      if (isSelected) {
+        selectedCuisines = selectedCuisines.filter(c => c !== cuisineName);
+        element.className = "cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-[var(--chip-bg)] text-[var(--chip-text)] hover:text-slate-900 dark:hover:text-white border border-[var(--chip-border)] flex items-center space-x-1";
+        element.innerHTML = `<span>${cuisineName}</span>`;
+      } else {
+        selectedCuisines.push(cuisineName);
+        element.className = "cuisine-chip px-2.5 py-1 rounded-lg text-xs font-medium bg-crimson text-white border border-crimson/50 flex items-center space-x-1";
+        element.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i><span>${cuisineName}</span>`;
+        lucide.createIcons();
+      }
+      handleSearchSubmit();
+    }
+
+    function handleRatingChange(val) {
+      currentMinRating = parseFloat(val);
+      document.getElementById('ratingDisplay').innerText = `${currentMinRating.toFixed(1)}★`;
+      handleSearchSubmit();
+    }
+
+    function showEmptyState() {
+      document.getElementById('restaurantCardsContainer').classList.add('hidden');
+      document.getElementById('emptyStateContainer').classList.remove('hidden');
+      document.getElementById('resultsCount').innerText = "0 matches found";
+    }
+
+    function resetAndRelaxFilters() {
+      document.getElementById('ratingRange').value = 3.5;
+      currentMinRating = 3.5;
+      document.getElementById('ratingDisplay').innerText = "3.5★";
+      setBudgetTier('medium');
+      document.getElementById('emptyStateContainer').classList.add('hidden');
+      document.getElementById('restaurantCardsContainer').classList.remove('hidden');
+      handleSearchSubmit();
+    }
+
+    function resetFilters() {
+      document.getElementById('ratingRange').value = 4.0;
+      currentMinRating = 4.0;
+      document.getElementById('ratingDisplay').innerText = "4.0★";
+      setBudgetTier('medium');
+      selectedCuisines = ['Italian', 'Continental'];
+      handleSearchSubmit();
+    }
+
+    function clearSearchInput() {
+      document.getElementById('naturalSearchInput').value = '';
+      document.getElementById('naturalSearchInput').focus();
+    }
+
+    // Modal Handlers
+    function openReservationModal(name) {
+      document.getElementById('modalRestaurantName').innerText = name;
+      document.getElementById('reservationModal').classList.remove('hidden');
+      document.getElementById('reservationModal').classList.add('flex');
+    }
+
+    function closeReservationModal() {
+      document.getElementById('reservationModal').classList.add('hidden');
+      document.getElementById('reservationModal').classList.remove('flex');
+    }
+
+    function confirmBooking() {
+      closeReservationModal();
+      showToast("Table reserved successfully! Instant confirmation sent to WhatsApp.");
+    }
+
+    function openMenuModal(name, cuisine) {
+      document.getElementById('menuModalTitle').innerHTML = `<span>${escapeHtml(name)} Highlights</span><span class="text-[10px] px-2 py-0.5 bg-crimson/20 text-crimson font-bold rounded">AI Pick</span>`;
+      document.getElementById('menuModalSubtitle').innerText = `Curated dishes matching ${escapeHtml(cuisine || 'chef specials')}`;
+      
+      const itemsContainer = document.getElementById('menuModalItems');
+      itemsContainer.innerHTML = `
+        <div class="pt-3 flex justify-between items-start">
+          <div>
+            <div class="font-bold text-slate-900 dark:text-white">Chef's Signature Platter</div>
+            <div class="text-slate-500 dark:text-slate-400 text-[11px]">House special recipe prepared with organic herbs and artisanal reduction</div>
+          </div>
+          <div class="font-mono font-bold text-emeraldMatch text-sm">₹580</div>
+        </div>
+        <div class="pt-3 flex justify-between items-start">
+          <div>
+            <div class="font-bold text-slate-900 dark:text-white">Handcrafted Truffle Special</div>
+            <div class="text-slate-500 dark:text-slate-400 text-[11px]">Emulsified herb butter sauce with toasted Sicilian nuts</div>
+          </div>
+          <div class="font-mono font-bold text-emeraldMatch text-sm">₹490</div>
+        </div>
+        <div class="pt-3 flex justify-between items-start">
+          <div>
+            <div class="font-bold text-slate-900 dark:text-white">Artisanal House Dessert</div>
+            <div class="text-slate-500 dark:text-slate-400 text-[11px]">Freshly baked crust with dark Belgian chocolate and espresso glaze</div>
+          </div>
+          <div class="font-mono font-bold text-emeraldMatch text-sm">₹340</div>
+        </div>
+      `;
+
+      document.getElementById('menuModal').classList.remove('hidden');
+      document.getElementById('menuModal').classList.add('flex');
+    }
+
+    function closeMenuModal() {
+      document.getElementById('menuModal').classList.add('hidden');
+      document.getElementById('menuModal').classList.remove('flex');
+    }
+
+    // Favorites & Saved Drawer
+    function toggleFavorite(btn, name) {
+      const icon = btn.querySelector('svg') || btn.querySelector('i');
+      if (savedRestaurants.includes(name)) {
+        savedRestaurants = savedRestaurants.filter(n => n !== name);
+        if (icon) {
+          icon.classList.remove('fill-crimson', 'text-crimson');
+          icon.classList.add('text-slate-300');
+        }
+        showToast(`Removed ${name} from saved.`);
+      } else {
+        savedRestaurants.push(name);
+        if (icon) {
+          icon.classList.add('fill-crimson', 'text-crimson');
+          icon.classList.remove('text-slate-300');
+        }
+        showToast(`Saved ${name} to your recommendations!`);
+      }
+      updateSavedDrawer();
+    }
+
+    function updateSavedDrawer() {
+      document.getElementById('savedCount').innerText = savedRestaurants.length;
+      const list = document.getElementById('savedListContainer');
+      if (!savedRestaurants.length) {
+        list.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 py-4 text-center">No saved restaurants yet. Click the heart icon on any card to save it!</p>`;
+        return;
+      }
+      list.innerHTML = savedRestaurants.map(name => `
+        <div class="p-3 rounded-xl bg-[var(--chip-bg)] border border-[var(--panel-border)] flex justify-between items-center text-xs">
+          <div>
+            <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(name)}</div>
+            <div class="text-slate-500 dark:text-slate-400 text-[11px]">${currentLocation} • Saved Match</div>
+          </div>
+          <button class="text-slate-400 hover:text-crimson p-1" onclick="removeSaved('${escapeHtml(name)}')">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function removeSaved(name) {
+      savedRestaurants = savedRestaurants.filter(n => n !== name);
+      updateSavedDrawer();
+      showToast(`Removed ${name} from saved.`);
+      const cards = document.querySelectorAll('.restaurant-card');
+      cards.forEach(c => {
+        const title = c.querySelector('h3')?.innerText;
+        if (title === name) {
+          const icon = c.querySelector('button i, button svg');
+          if (icon) {
+            icon.classList.remove('fill-crimson', 'text-crimson');
+            icon.classList.add('text-slate-300');
+          }
+        }
+      });
+    }
+
+    function toggleSavedDrawer() {
+      const drawer = document.getElementById('savedDrawer');
+      const isClosed = drawer.classList.contains('translate-x-full');
+      if (isClosed) {
+        drawer.classList.remove('translate-x-full');
+      } else {
+        drawer.classList.add('translate-x-full');
+      }
+    }
+
+    function toggleMobileFilters() {
+      const drawer = document.getElementById('mobileFilterDrawer');
+      if (drawer.classList.contains('hidden')) {
+        drawer.classList.remove('hidden');
+        drawer.classList.add('flex');
+      } else {
+        drawer.classList.add('hidden');
+        drawer.classList.remove('flex');
+      }
+    }
+
+    function setGridCols(cols) {
+      const container = document.getElementById('restaurantCardsContainer');
+      const btn3 = document.getElementById('btnGrid3');
+      const btn2 = document.getElementById('btnGrid2');
+      if (cols === 2) {
+        container.className = "grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300";
+        btn2.className = "p-1 rounded bg-crimson text-white";
+        btn3.className = "p-1 rounded text-slate-400 hover:text-[var(--text-main)]";
+      } else {
+        container.className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 transition-all duration-300";
+        btn3.className = "p-1 rounded bg-crimson text-white";
+        btn2.className = "p-1 rounded text-slate-400 hover:text-[var(--text-main)]";
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+n8n single-agent workflow that accepts a location in the user's prompt and returns the current weather for that location

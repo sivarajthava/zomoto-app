@@ -1,0 +1,294 @@
+# VERA AI CHALLENGE — PROJECT KNOWLEDGE BASE
+
+Version: 1.0
+Purpose: Persistent domain and product knowledge for Antigravity
+Project: magicpin Vera AI Challenge
+Official Challenge: https://magicpin.com/vera/ai-challenge
+
+---
+
+# 1. PROJECT PURPOSE
+
+Build an AI-powered assistant inspired by Vera, magicpin's AI marketing assistant.
+
+The system should help a merchant/restaurant understand its business situation, identify useful opportunities, and take or recommend appropriate marketing/business actions.
+
+The implementation should demonstrate:
+
+1. Reliable business-context understanding
+2. Useful merchant insights
+3. Intelligent opportunity detection
+4. Personalised recommendations
+5. Natural conversational interaction
+6. Strong grounding in available business data
+7. Safe and predictable AI behaviour
+8. Clear separation between deterministic business logic and LLM-generated language
+9. Testability and explainability
+10. Production-oriented engineering quality
+
+The objective is NOT to build a generic chatbot.
+
+The objective is to build a domain-aware merchant/business assistant.
+
+---
+
+# 2. OFFICIAL PRODUCT CONTEXT
+
+magicpin positions Vera as an AI assistant/marketing assistant for businesses.
+
+Official Vera information describes Vera as:
+
+"Your AI marketing assistant — one place, one login."
+
+magicpin's public material describes Vera as supporting restaurants and small retailers with areas including:
+
+* Digital presence
+* Real-time order-demand insights
+* Daily business/operational support
+* Marketing assistance
+* Business insights
+
+magicpin operates in a hyperlocal commerce ecosystem connecting customers and local businesses.
+
+The broader magicpin platform covers areas such as:
+
+* Restaurants
+* Food
+* Fashion
+* Grocery
+* Beauty
+* Pharmacy
+* Electronics
+* Fitness
+* Hotels
+* Local retail
+* Online/offline commerce
+
+magicpin's business platform also describes data-driven targeting based on:
+
+* Demographics
+* Location
+* Past consumption patterns
+* Time of day
+
+It also discusses:
+
+* Customer preferences
+* Customer transactions
+* Potential customers
+* Competitor insights
+* Category growth
+* Customer acquisition
+* Repeat customers
+* Hyperlocal engagement
+
+These concepts can be used as domain inspiration.
+
+Do not assume that every capability is required by the challenge.
+
+---
+
+# 3. IMPORTANT IMPLEMENTATION PRINCIPLE
+
+The project must NOT become an LLM-only application.
+
+Use this architecture principle:
+
+APPLICATION LOGIC > LLM GUESSING
+
+CONTEXT DATA > GENERATED ASSUMPTIONS
+
+DETERMINISTIC RULES > LLM DECISIONS
+
+VALIDATED OUTPUT > RAW LLM OUTPUT
+
+EXPLAINABLE DECISIONS > BLACK-BOX DECISIONS
+
+The LLM should primarily help with:
+
+* Understanding natural language
+* Generating natural responses
+* Summarising business information
+* Explaining already-derived insights
+* Conversational interaction
+* Translating structured business decisions into useful language
+
+The LLM should NOT independently invent:
+
+* Sales numbers
+* Customer behaviour
+* Revenue
+* Discounts
+* Business policies
+* Merchant facts
+* Competitor information
+* Inventory
+* Campaign results
+* Performance metrics
+
+---
+
+# 4. CORE PROBLEM
+
+A merchant has business data but may not know:
+
+* What is happening?
+* Why is it happening?
+* Which customers should be targeted?
+* Which products/categories need attention?
+* When should a campaign run?
+* Which business opportunity is most relevant?
+* Whether a marketing action should be taken now?
+* What action could improve the situation?
+
+The assistant should transform raw business information into:
+
+DATA
+↓
+BUSINESS CONTEXT
+↓
+SIGNALS
+↓
+OPPORTUNITIES
+↓
+RECOMMENDED ACTION
+↓
+EXPLANATION
+↓
+CONVERSATIONAL RESPONSE
+
+---
+
+# 5. PRIMARY USER
+
+Primary user:
+
+Merchant / restaurant owner / small retailer / business operator.
+
+The user may ask questions such as:
+
+* How is my business doing?
+* Why are my orders down?
+* What should I do today?
+* Which customers should I target?
+* Should I run an offer?
+* Which product should I promote?
+* What happened this week?
+* How can I increase repeat orders?
+* Why did sales drop?
+* Which category is performing well?
+* Which customers have not returned?
+* Is there an opportunity to increase orders today?
+* What campaign should I run?
+* Explain my recent performance.
+* Give me a marketing idea.
+
+The exact challenge-required interactions must be verified from the official challenge specification if additional requirements become available.
+
+---
+
+# 6. DOMAIN MODEL
+
+The system should conceptually understand these entities.
+
+## Merchant
+
+Represents the business.
+
+Possible attributes:
+
+* merchantId
+* merchantName
+* businessType
+* category
+* locality
+* city
+* operatingHours
+* status
+* campaignPreferences
+* businessGoals
+
+---
+
+## Store
+
+A merchant may have one or more stores.
+
+Attributes:
+
+* storeId
+* merchantId
+* location
+* locality
+* city
+* category
+* openingHours
+* status
+
+---
+
+## Customer
+
+Represents a customer interacting with the merchant.
+
+Possible attributes:
+
+* customerId
+* demographicSegment
+* locality
+* acquisitionDate
+* lastOrderDate
+* orderFrequency
+* averageOrderValue
+* preferredCategories
+* preferredProducts
+* totalOrders
+* totalSpend
+
+Do not expose sensitive personal information unnecessarily.
+
+---
+
+## Order
+
+Represents a customer transaction/order.
+
+Possible attributes:
+
+* orderId
+* merchantId
+* storeId
+* customerId
+* orderDate
+* orderValue
+* category
+* products
+* status
+* channel
+
+---
+
+## Product
+
+Represents a product/service/menu item.
+
+Possible attributes:
+
+* productId
+* productName
+* category
+* price
+* availability
+* orderCount
+* revenue
+* conversionRate
+
+---
+
+## Category
+
+Examples:
+
+* Food
+* Fashion
+* Grocer

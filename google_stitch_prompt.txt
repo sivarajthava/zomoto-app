@@ -1,0 +1,119 @@
+You are a Principal Frontend Architect and Design System Specialist. Build a production-grade, component-based, dark-theme web application for an "AI-Powered Restaurant Recommendation Platform" (inspired by Zomato and modern luxury dining discovery apps).
+
+---
+
+### 🎨 1. DESIGN SYSTEM & VISUAL IDENTITY (DARK THEME)
+
+- Color Palette:
+  - Base Canvas: Deep Obsidian (#0B0F19) and Slate Black (#0F172A).
+  - Surface & Cards: Elevated Midnight Charcoal (#1E293B) with 1px subtle borders (rgba(255, 255, 255, 0.08)), glassmorphism (backdrop-filter: blur(12px)), and soft depth shadows (0 8px 32px 0 rgba(0, 0, 0, 0.37)).
+  - Primary Accent: Electric Zomato Crimson (#E23744) and Coral Neon (#FF5252) with subtle glow on hover.
+  - Accent & Badges:
+    - Star Rating Gold: #F59E0B
+    - Budget / Positive Match: #10B981 (Emerald)
+    - AI Reasoning / Sparkle: #8B5CF6 (Electric Violet) / #06B6D4 (Cyan)
+  - Typography: Clean modern sans-serif (Inter, Plus Jakarta Sans, or Outfit).
+    - Primary Text: #F8FAFC (900/700 weight for headers)
+    - Muted Secondary: #94A3B8 (400/500 weight)
+    - Micro-labels: #64748B uppercase with letter-spacing: 0.05em.
+
+---
+
+### 🧩 2. COMPONENT ARCHITECTURE & SPECIFICATIONS
+
+Generate clean, reusable, encapsulated components with clear separation of concerns:
+
+#### 1. <AppNavbar />
+- Branding: "Zomato AI" with a glowing crimson flame/fork icon and "DineMind" subtitle.
+- Location Selector: Autocomplete chip with map-pin icon defaulting to "Bangalore, IN".
+- Backend Status Pill: Green glowing dot indicating "API Online • Groq LPU Powered".
+- Actions: "Saved Recommendations" bookmark button and GitHub/Docs link.
+
+#### 2. <ConversationalHero />
+- Headline: "Discover Dining Tailored to Your Taste & Mood".
+- Natural Language Search Box:
+  - Large, pill-shaped input with frosted-glass background and glowing crimson focus ring.
+  - Placeholder: "e.g., Cozy romantic rooftop with candle-lit seating, great Italian wine, under ₹1500..."
+  - Prominent "Ask AI 🍽️" submit button with hover scale animation.
+- Inspiration Quick-Chips:
+  - Clickable filter presets:
+    - 💑 Romantic Date Night
+    - 🍕 Cheap Student Hangout
+    - 👨‍👩‍👧 Sunday Family Brunch
+    - 🌙 Late Night Quick Bites
+    - 🥗 Vegan & Organic
+  - Clicking a chip pre-fills all filters and fires the recommendation request.
+
+#### 3. <FilterPanel /> (Collapsible Sidebar or Horizontal Drawer)
+- Budget Tier Segmented Selector:
+  - Three distinct segment buttons:
+    - ₹ Budget (≤ ₹500)
+    - ₹₹ Medium (₹500 – ₹1,500)
+    - ₹₹₹ Fine Dining (> ₹1,500)
+- Cuisine Multi-Select Cloud:
+  - Interactive toggle chips (North Indian, Italian, Chinese, Continental, Cafe, Desserts, Street Food).
+  - Selected state: crimson background with checkmark icon.
+- Minimum Rating Stepper / Slider:
+  - Star rating control from 3.0★ to 4.8★ with real-time numeric display.
+- Dynamic Relaxation Alert:
+  - A subtle amber badge ("⚠️ Criteria expanded to adjacent budget") that appears when dynamic relaxation is active.
+
+#### 4. <AISummaryBanner />
+- Displayed above the results grid when recommendations are loaded.
+- Styled as a sleek gradient card (from-violet-950/40 to-slate-900/60 with violet border).
+- Contains an AI sparkle icon, synthesized overview text explaining the trade-offs, and an "is_fallback" indicator if served offline.
+
+#### 5. <RestaurantCard /> (The Core Display Component)
+- Card Header:
+  - Prominent #1, #2, #3 metallic rank badge on the top-left.
+  - Restaurant Name (H3, #F8FAFC) with locality subtitle (e.g., "Indiranagar, Bangalore").
+  - High-contrast rating badge on top-right: e.g. ★ 4.6 in gold with vote count (1,250+ votes).
+- Card Metadata Row:
+  - Cuisine tags (small pill badges).
+  - Average Cost for Two pill: ₹1,400 for two.
+  - Budget Tier tag (Medium Budget).
+  - Popular Dishes list (e.g. "Popular: Sourdough Pizza, Tiramisu").
+- AI Justification Box (Key Feature):
+  - Stylized quote container with a faint violet gradient background and left-accent border.
+  - Sparkle icon + label: "Why AI Picked This For You".
+  - Humanized explanation text explaining how it satisfies the user's vibes, occasion, and constraints.
+- Card Actions:
+  - "View Menu & Directions" (Ghost button)
+  - "Reserve Table" (Solid primary button)
+  - Favorite Heart toggle button.
+
+#### 6. <LoadingSkeleton /> & <EmptyState />
+- Skeleton: Shimmering translucent card placeholders matching the exact card geometry while fetching recommendations.
+- Empty State: Friendly illustration, "No exact matches in this locality", and a one-click "Relax Filters" button.
+
+---
+
+### 📡 3. DATA CONTRACT (PROPS & STATE)
+
+Bind components to the following JSON structure from POST /api/v1/recommendations:
+
+interface RestaurantRecommendation {
+  rank: number;
+  restaurant_name: string;
+  cuisine: string;
+  rating: number;
+  estimated_cost_for_two: number;
+  explanation: string;
+}
+
+interface RecommendationResponse {
+  summary: string;
+  is_fallback: boolean;
+  recommendations: RestaurantRecommendation[];
+}
+
+---
+
+### ✨ 4. INTERACTION & ANIMATION REQUIREMENTS
+
+1. Micro-interactions: Subtle transform: translateY(-4px) with box-shadow increase on hover over <RestaurantCard />.
+2. Smooth Transitions: View transitions when switching filters or submitting queries.
+3. Responsive Breakpoints:
+   - Mobile (<640px): Single-column stack, bottom sheet drawer for filters.
+   - Tablet (640px–1024px): 2-column grid.
+   - Desktop (>1024px): Sticky left filter sidebar with 3-column recommendation grid.

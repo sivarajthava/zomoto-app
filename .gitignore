@@ -1,0 +1,36 @@
+# Python virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables & secrets
+.env
+*.local
+
+# Raw and processed datasets (avoid checking large binary/parquet data into git)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+!data/processed/zomato_clean.parquet
+
+# Testing & Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
