@@ -51,7 +51,7 @@ function renderBudgetBands(bands) {
 
 async function loadMeta() {
   try {
-    const response = await fetch(`${API_BASE}/api/meta`);
+    const response = await fetch(`${API_BASE}/api/v1/metadata`);
     if (!response.ok) throw new Error(`Catalog returned ${response.status}`);
     const meta = await response.json();
     fillDatalist("locality-list", meta.localities);
