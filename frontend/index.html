@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="Grounded AI restaurant recommendations for Bangalore."
+    />
+    <title>nosh · Bangalore restaurant recommendations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="shell topbar__inner">
+        <div class="topbar__group">
+          <span class="brand">nosh<span>.</span></span>
+          <span class="pill">⌖ Bangalore <span class="dot dot--live"></span></span>
+        </div>
+        <p class="topbar__tagline">Curated dining via hard filters &amp; AI reasoning</p>
+        <span class="pill pill--mint" id="engine-status">
+          <span class="dot"></span> Connecting to catalog
+        </span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero__glow" aria-hidden="true"></div>
+        <div class="shell hero__inner">
+          <span class="pill pill--gold">✦ Neural preference engine</span>
+          <h1>Late-night cravings, <em>mathematically matched.</em></h1>
+          <p class="hero__lede">
+            Hard filters narrow the verified Bangalore catalog first. The model then ranks
+            that shortlist and explains why each place matches your mood.
+          </p>
+        </div>
+      </section>
+
+      <div class="shell">
+        <form id="prefs" class="panel">
+          <div class="panel__grid">
+            <div class="field field--locality">
+              <label class="field__label" for="locality">
+                <span>Locality</span><span class="field__hint">Verified node</span>
+              </label>
+              <div class="control">
+                <span class="control__icon">⌖</span>
+                <input id="locality" name="locality" type="text" list="locality-list"
+                  placeholder="e.g. Banashankari" autocomplete="off" required />
+              </div>
+              <datalist id="locality-list"></datalist>
+            </div>
+
+            <div class="field field--cuisine">
+              <label class="field__label" for="cuisine">Cuisine preferences</label>
+              <div class="control">
+                <span class="control__icon control__icon--gold">♨</span>
+                <input id="cuisine" name="cuisine" type="text" list="cuisine-list"
+                  placeholder="e.g. Italian" autocomplete="off" />
+              </div>
+              <datalist id="cuisine-list"></datalist>
+            </div>
+
+            <div class="field field--rating">
+              <div class="field__label">
+                <label for="min_rating">Threshold</label>
+                <output class="threshold num" id="rating-out" for="min_rating">Min 4.0 ★</output>
+              </div>
+              <div class="control">
+                <input class="slider" id="min_rating" name="min_rating" type="range"
+                  min="0" max="5" step="0.1" value="4.0" />
+              </div>
+            </div>
+
+            <div class="field field--budget" role="group" aria-labelledby="budget-label">
+              <span class="field__label" id="budget-label">Budget tier (for two)</span>
+              <div class="segments" id="budget-segments">
+                <label class="segment"><input type="radio" name="budget" value="low" /><span>Low · ≤ ₹400</span></label>
+                <label class="segment"><input type="radio" name="budget" value="medium" checked /><span>Medium · ₹401–800</span></label>
+                <label class="segment"><input type="radio" name="budget" value="high" /><span>High · ≥ ₹801</span></label>
+              </div>
+            </div>
+
+            <div class="field field--extras">
+              <label class="field__label" for="extras">
+                <span>Sensory &amp; context hints</span><span class="field__hint">LLM input</span>
+              </label>
+              <div class="control control--extras">
+                <textarea id="extras" name="extras" rows="1"
+                  placeholder="quiet garden seating, quick service, table booking"></textarea>
+                <span class="control__icon control__icon--gold">✦</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel__footer">
+            <p class="panel__status" aria-live="polite">
+              <span class="bolt">ϟ</span>
+              <span id="status-text">Filters run against the catalog before anything reaches the model.</span>
+            </p>
+            <button class="cta" type="submit" id="submit">
+              <span>Find restaurants</span><span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="shell results" id="results" aria-live="polite">
+        <div class="empty">
+          <span class="empty__mark">◉</span>
+          <p class="empty__title">Pick a neighborhood to start.</p>
+          <p class="empty__text">
+            Choose a Bangalore locality, set your budget and rating floor, then tell us the mood.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="shell footer__inner">
+        <div>
+          <p>Recommendations from a cleaned Bangalore Zomato catalog.</p>
+          <p>AI never invents restaurants.</p>
+        </div>
+        <span class="pill">✓ Zero hallucination policy</span>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
