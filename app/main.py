@@ -146,6 +146,12 @@ async def health_check(data_loader: DataLoader = Depends(get_data_loader)):
 
 
 @app.get(
+    "/api/meta",
+    response_model=MetadataResponse,
+    summary="Filter Metadata (Shorthand)",
+    tags=["Recommendations"],
+)
+@app.get(
     "/api/v1/metadata",
     response_model=MetadataResponse,
     summary="Filter Metadata",
@@ -156,6 +162,12 @@ async def get_filter_metadata(data_loader: DataLoader = Depends(get_data_loader)
     return data_loader.metadata
 
 
+@app.post(
+    "/api/recommend",
+    response_model=RecommendationResponse,
+    summary="Get Recommendations (Shorthand)",
+    tags=["Recommendations"],
+)
 @app.post(
     "/api/v1/recommendations",
     response_model=RecommendationResponse,

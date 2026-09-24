@@ -45,6 +45,22 @@ class TestApiEndpoints:
             assert data["budget_tiers"] == ["low", "medium", "high"]
 
     @pytest.mark.asyncio
+    async def test_shorthand_routes_meta_and_recommend(self, client_transport):
+        async with AsyncClient(transport=client_transport, base_url="http://test") as ac:
+            meta_res = await ac.get("/api/meta")
+            assert meta_res.status_code == 200
+            assert "cities" in meta_res.json()
+
+            payload = {
+                "location": "Bangalore",
+                "budget_tier": "low",
+                "min_rating": 3.8,
+            }
+            rec_res = await ac.post("/api/recommend", json=payload)
+            assert rec_res.status_code == 200
+            assert "recommendations" in rec_res.json()
+
+    @pytest.mark.asyncio
     async def test_post_recommendations_success(self, client_transport):
         payload = {
             "location": "Bangalore",
