@@ -13,6 +13,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from app.config import settings
 from app.models import (
@@ -34,6 +35,7 @@ logging.basicConfig(
 logger = logging.getLogger("zomato_app")
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+templates = Jinja2Templates(directory=str(STATIC_DIR)) if STATIC_DIR.exists() else None
 
 
 @asynccontextmanager
@@ -73,6 +75,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Process-Time"],
 )
 
 
@@ -100,11 +103,28 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 @app.get("/", summary="Root Index", tags=["Health & Info"])
-async def root(request: Request):
-    """Serve the DineMind AI web frontend for browsers, or JSON metadata for API clients."""
+async def root(
+    request: Request,
+    data_loader: DataLoader = Depends(get_data_loader),
+):
+    """Serve the Midnight Epicure web frontend for browsers (Jinja debug fallback), or JSON metadata for API clients."""
     accept_header = request.headers.get("accept", "")
     index_file = STATIC_DIR / "index.html"
     if "text/html" in accept_header and index_file.exists():
+        if templates is not None:
+            try:
+                record_count = len(data_loader.df)
+            except Exception:
+                record_count = 0
+            return templates.TemplateResponse(
+                request=request,
+                name="index.html",
+                context={
+                    "records_loaded": record_count,
+                    "model": settings.default_llm_model,
+                    "environment": settings.environment,
+                },
+            )
         return FileResponse(str(index_file))
 
     return {
@@ -115,14 +135,31 @@ async def root(request: Request):
     }
 
 
-@app.get("/app", response_class=FileResponse, summary="DineMind Web Frontend", tags=["Frontend"])
-async def web_app():
-    """Directly serve the DineMind AI Google Stitch web frontend."""
+@app.get("/app", summary="Midnight Epicure Web Frontend", tags=["Frontend"])
+async def web_app(
+    request: Request,
+    data_loader: DataLoader = Depends(get_data_loader),
+):
+    """Directly serve the Midnight Epicure web frontend."""
     index_file = STATIC_DIR / "index.html"
     if not index_file.exists():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Frontend asset index.html not found.",
+        )
+    if templates is not None:
+        try:
+            record_count = len(data_loader.df)
+        except Exception:
+            record_count = 0
+        return templates.TemplateResponse(
+            request=request,
+            name="index.html",
+            context={
+                "records_loaded": record_count,
+                "model": settings.default_llm_model,
+                "environment": settings.environment,
+            },
         )
     return FileResponse(str(index_file))
 

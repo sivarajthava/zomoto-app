@@ -866,10 +866,16 @@
     // 2. Fetch dataset metadata (localities & cuisines)
     async function fetchMetadata() {
       try {
-        let res = await fetch(`${API_BASE}/api/v1/metadata`);
+        let res = await fetch(`${API_BASE}/api/meta`);
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/api/v1/metadata`);
+        }
         if (!res.ok && !API_BASE) {
           API_BASE = RAILWAY_PROD_URL;
-          res = await fetch(`${API_BASE}/api/v1/metadata`);
+          res = await fetch(`${API_BASE}/api/meta`);
+          if (!res.ok) {
+            res = await fetch(`${API_BASE}/api/v1/metadata`);
+          }
         }
         if (res.ok) {
           const data = await res.json();
@@ -880,11 +886,15 @@
         if (!API_BASE) {
           try {
             API_BASE = RAILWAY_PROD_URL;
-            const res = await fetch(`${API_BASE}/api/v1/metadata`);
+            let res = await fetch(`${API_BASE}/api/meta`);
+            if (!res.ok) {
+              res = await fetch(`${API_BASE}/api/v1/metadata`);
+            }
             if (res.ok) {
               const data = await res.json();
               populateLocalities(data.localities || []);
               populateCuisines(data.cuisines || []);
+              return;
             }
           } catch (e2) {}
         }
@@ -977,18 +987,32 @@
 
       try {
         const startTime = performance.now();
-        let res = await fetch(`${API_BASE}/api/v1/recommendations`, {
+        let res = await fetch(`${API_BASE}/api/recommend`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        if (!res.ok && !API_BASE) {
-          API_BASE = RAILWAY_PROD_URL;
+        if (!res.ok) {
           res = await fetch(`${API_BASE}/api/v1/recommendations`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
+        }
+        if (!res.ok && !API_BASE) {
+          API_BASE = RAILWAY_PROD_URL;
+          res = await fetch(`${API_BASE}/api/recommend`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) {
+            res = await fetch(`${API_BASE}/api/v1/recommendations`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+          }
         }
         const elapsed = Math.round(performance.now() - startTime);
         document.getElementById('latencyDisplay').innerText = `${elapsed}ms`;
@@ -1003,11 +1027,18 @@
         if (!API_BASE) {
           try {
             API_BASE = RAILWAY_PROD_URL;
-            const res = await fetch(`${API_BASE}/api/v1/recommendations`, {
+            let res = await fetch(`${API_BASE}/api/recommend`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
             });
+            if (!res.ok) {
+              res = await fetch(`${API_BASE}/api/v1/recommendations`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+            }
             if (res.ok) {
               const data = await res.json();
               renderResultsData(data);

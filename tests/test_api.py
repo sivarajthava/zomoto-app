@@ -24,6 +24,22 @@ class TestApiEndpoints:
             assert "X-Process-Time" in res.headers
 
     @pytest.mark.asyncio
+    async def test_root_endpoint_html_browser(self, client_transport):
+        async with AsyncClient(transport=client_transport, base_url="http://test") as ac:
+            res = await ac.get("/", headers={"accept": "text/html,application/xhtml+xml"})
+            assert res.status_code == 200
+            assert "text/html" in res.headers.get("content-type", "")
+            assert "DineMind" in res.text or "zomato" in res.text
+
+    @pytest.mark.asyncio
+    async def test_app_endpoint_html(self, client_transport):
+        async with AsyncClient(transport=client_transport, base_url="http://test") as ac:
+            res = await ac.get("/app")
+            assert res.status_code == 200
+            assert "text/html" in res.headers.get("content-type", "")
+            assert "DineMind" in res.text or "zomato" in res.text
+
+    @pytest.mark.asyncio
     async def test_health_check_endpoint(self, client_transport):
         async with AsyncClient(transport=client_transport, base_url="http://test") as ac:
             res = await ac.get("/health")
