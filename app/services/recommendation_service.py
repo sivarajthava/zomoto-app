@@ -39,9 +39,14 @@ class RecommendationOrchestrator:
             return RecommendationResponse(
                 summary=(
                     f"No matching restaurants found in '{request.location}'. "
-                    "Please check the location name or try a supported city like Bangalore."
+                    "Please check the location name or try a supported locality like Koramangala or Indiranagar."
                 ),
                 is_fallback=True,
+                llm_used=False,
+                candidate_count=0,
+                message=f"No verified matches in {request.location}. Widen the budget or try a nearby sector.",
+                did_you_mean=["Indiranagar", "Koramangala", "HSR", "Whitefield", "Jayanagar", "JP Nagar"],
+                relaxed_criteria=False,
                 recommendations=[],
             )
 
@@ -52,6 +57,11 @@ class RecommendationOrchestrator:
             candidates=candidates,
             is_relaxed=is_relaxed,
         )
+        response.candidate_count = len(candidates)
+        response.relaxed_criteria = is_relaxed
+        if is_relaxed and not response.message:
+            response.message = "Filters relaxed slightly to find top matching venues in neighboring sectors."
+
         stage_2_ms = (time.perf_counter() - llm_start) * 1000
         total_ms = (time.perf_counter() - start_time) * 1000
 

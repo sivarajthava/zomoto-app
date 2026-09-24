@@ -51,13 +51,25 @@ class FallbackRankingEngine:
                 f"{dishes_str}"
             )
 
+            rest_types = [t.strip() for t in c.rest_type.split(",") if t.strip()] if c.rest_type else []
+            dishes = [d.strip() for d in c.dish_liked.split(",") if d.strip()] if c.dish_liked else []
+
             recs.append(
                 RestaurantRecommendation(
                     rank=idx,
                     restaurant_name=c.name,
+                    name=c.name,
                     cuisine=c.cuisines_str or "Multi-Cuisine",
+                    cuisines=c.cuisines_list or ([c.cuisines_str] if c.cuisines_str else []),
                     rating=c.aggregate_rating if c.aggregate_rating else 3.5,
+                    votes=c.votes,
                     estimated_cost_for_two=c.average_cost_for_two,
+                    estimated_cost=c.average_cost_for_two,
+                    locality=c.locality,
+                    rest_types=rest_types,
+                    book_table=str(c.book_table).lower() in ("yes", "true", "1"),
+                    online_order=str(c.online_order).lower() in ("yes", "true", "1"),
+                    dish_liked=dishes,
                     explanation=explanation,
                 )
             )
@@ -206,11 +218,22 @@ class LLMService:
             key = rec.restaurant_name.strip().lower()
             if key in candidate_name_map:
                 matched_candidate = candidate_name_map[key]
-                # Normalize official name and rating from authoritative source
+                # Normalize official name, costs, flags, and categories from authoritative source
                 rec.restaurant_name = matched_candidate.name
+                rec.name = matched_candidate.name
                 if matched_candidate.aggregate_rating:
                     rec.rating = matched_candidate.aggregate_rating
+                rec.votes = matched_candidate.votes
                 rec.estimated_cost_for_two = matched_candidate.average_cost_for_two
+                rec.estimated_cost = matched_candidate.average_cost_for_two
+                rec.locality = matched_candidate.locality
+                rec.cuisines = matched_candidate.cuisines_list or ([matched_candidate.cuisines_str] if matched_candidate.cuisines_str else [])
+                if not rec.cuisine and matched_candidate.cuisines_str:
+                    rec.cuisine = matched_candidate.cuisines_str
+                rec.rest_types = [t.strip() for t in matched_candidate.rest_type.split(",") if t.strip()] if matched_candidate.rest_type else []
+                rec.book_table = str(matched_candidate.book_table).lower() in ("yes", "true", "1")
+                rec.online_order = str(matched_candidate.online_order).lower() in ("yes", "true", "1")
+                rec.dish_liked = [d.strip() for d in matched_candidate.dish_liked.split(",") if d.strip()] if matched_candidate.dish_liked else []
                 verified.append(rec)
             else:
                 logger.warning(

@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from app.config import settings
-from app.models import MetadataResponse, Restaurant
+from app.models import BudgetBand, MetadataResponse, Restaurant
 
 
 class DataLoader:
@@ -68,12 +68,19 @@ class DataLoader:
         for c_set in df["cuisines_set"]:
             all_cuisines.update(c.title() for c in c_set if c)
 
+        budget_bands = [
+            BudgetBand(id="low", label="Low · ≤ ₹500", min_cost=0, max_cost=500),
+            BudgetBand(id="medium", label="Medium · ₹500–1,500", min_cost=500, max_cost=1500),
+            BudgetBand(id="high", label="High · ≥ ₹1,500", min_cost=1500, max_cost=None),
+        ]
+
         self._metadata = MetadataResponse(
             total_restaurants=len(df),
             cities=sorted(df["city"].unique().tolist()),
             localities=sorted(df["locality"].unique().tolist()),
             cuisines=sorted(all_cuisines),
             budget_tiers=["low", "medium", "high"],
+            budget_bands=budget_bands,
         )
 
         self._df = df

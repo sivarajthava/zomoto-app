@@ -33,6 +33,7 @@ class FilterService:
 
         # 1. Normalize Location Target
         loc_query = request.location.strip().lower()
+        is_relaxed = False
         if loc_query in {"bangalore", "bengaluru", "bengaluru city", "bangalore city"}:
             # Broad metro search across entire dataset (None skips location filtering overhead)
             base_mask = None
@@ -42,7 +43,11 @@ class FilterService:
                 df["locality_lower"].str.contains(loc_query, regex=False, na=False)
                 | df["city_lower"].str.contains(loc_query, regex=False, na=False)
             )
-            base_mask = loc_series if loc_series.any() else None
+            if loc_series.any():
+                base_mask = loc_series
+            else:
+                base_mask = None
+                is_relaxed = True
 
         # 2. Extract Desired Cuisines
         user_cuisines: Set[str] = {c.strip().lower() for c in request.cuisines if c.strip()}
@@ -50,7 +55,6 @@ class FilterService:
         # 3. Progressive Filtering & Dynamic Relaxation Pipeline
         target_budget = request.budget_tier.lower()
         min_rating = request.min_rating
-        is_relaxed = False
 
         # Attempt 0: Strict filters
         candidates_df = self._apply_filters(

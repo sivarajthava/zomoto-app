@@ -1,6 +1,22 @@
 {
   "rewrites": [
     {
+      "source": "/api/meta",
+      "destination": "https://zomoto-app-production.up.railway.app/api/v1/metadata"
+    },
+    {
+      "source": "/api/recommend",
+      "destination": "https://zomoto-app-production.up.railway.app/api/v1/recommendations"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://zomoto-app-production.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://zomoto-app-production.up.railway.app/health"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
