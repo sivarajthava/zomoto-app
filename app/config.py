@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     gemini_api_key: str = ""
     default_llm_model: str = "openai/gpt-oss-120b"
-    request_timeout_seconds: float = 6.0
+    request_timeout_seconds: float = 4.0
 
     # Environment & Server
     environment: str = "development"

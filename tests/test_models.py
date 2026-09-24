@@ -127,7 +127,7 @@ class TestApplicationSettings:
     """Test application settings defaults and path resolutions."""
 
     def test_default_settings(self):
-        s = Settings()
+        s = Settings(_env_file=None)
         assert s.default_llm_model == "openai/gpt-oss-120b"
         assert hasattr(s, "groq_api_key")
         assert s.max_candidates_stage_1 == 15

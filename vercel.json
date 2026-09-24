@@ -2,23 +2,23 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "cleanUrls": true,
-  
+
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://YOUR-RAILWAY-APP.up.railway.app/api/:path*"
+      "destination": "https://zomoto-app-production.up.railway.app/api/:path*"
     },
     {
       "source": "/health",
-      "destination": "https://YOUR-RAILWAY-APP.up.railway.app/health"
+      "destination": "https://zomoto-app-production.up.railway.app/health"
     },
     {
       "source": "/docs",
-      "destination": "https://YOUR-RAILWAY-APP.up.railway.app/docs"
+      "destination": "https://zomoto-app-production.up.railway.app/docs"
     },
     {
       "source": "/openapi.json",
-      "destination": "https://YOUR-RAILWAY-APP.up.railway.app/openapi.json"
+      "destination": "https://zomoto-app-production.up.railway.app/openapi.json"
     },
     {
       "source": "/",
