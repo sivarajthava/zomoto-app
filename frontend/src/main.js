@@ -238,11 +238,11 @@ async function search() {
 
   const data = new FormData(form);
   const payload = {
-    locality: data.get("locality"),
-    budget: data.get("budget"),
-    cuisine: data.get("cuisine") || null,
+    location: data.get("locality"),
+    budget_tier: data.get("budget"),
+    cuisines: data.get("cuisine") || null,
     min_rating: Number(data.get("min_rating")),
-    extras: data.get("extras") || null,
+    additional_preferences: data.get("extras") || null,
   };
 
   try {
