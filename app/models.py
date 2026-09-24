@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
-from pydantic import BaseModel, Field, field_validator
+from typing import Any, List, Optional
+from pydantic import AliasChoices, BaseModel, Field, field_validator
 
 
 class Restaurant(BaseModel):
@@ -32,16 +32,19 @@ class UserPreferenceRequest(BaseModel):
 
     location: str = Field(
         ...,
+        validation_alias=AliasChoices("location", "locality"),
         min_length=1,
         max_length=100,
         description="Target city or neighborhood (e.g., 'Bangalore', 'Koramangala', 'Indiranagar').",
     )
     budget_tier: str = Field(
         default="medium",
+        validation_alias=AliasChoices("budget_tier", "budget"),
         description="Budget tier classification: 'low' (<= ₹500), 'medium' (₹500 - ₹1500), 'high' (> ₹1500).",
     )
     cuisines: List[str] = Field(
         default_factory=list,
+        validation_alias=AliasChoices("cuisines", "cuisine"),
         description="Preferred cuisines (e.g. ['North Indian', 'Chinese', 'Italian']).",
     )
     min_rating: float = Field(
@@ -52,9 +55,22 @@ class UserPreferenceRequest(BaseModel):
     )
     additional_preferences: Optional[str] = Field(
         default=None,
+        validation_alias=AliasChoices("additional_preferences", "extras", "preferences"),
         max_length=300,
         description="Free-text preferences (e.g. 'romantic rooftop for anniversary', 'spacious for kids').",
     )
+
+    @field_validator("cuisines", mode="before")
+    @classmethod
+    def clean_cuisines(cls, v: Any) -> List[str]:
+        if v is None:
+            return []
+        if isinstance(v, str):
+            s = v.strip()
+            return [s] if s else []
+        if isinstance(v, (list, tuple, set)):
+            return [str(item).strip() for item in v if str(item).strip()]
+        return []
 
     @field_validator("location", mode="before")
     @classmethod

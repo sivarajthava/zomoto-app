@@ -51,7 +51,10 @@ function renderBudgetBands(bands) {
 
 async function loadMeta() {
   try {
-    const response = await fetch(`${API_BASE}/api/v1/metadata`);
+    let response = await fetch(`${API_BASE}/api/v1/metadata`);
+    if (!response.ok) {
+      response = await fetch(`${API_BASE}/api/meta`);
+    }
     if (!response.ok) throw new Error(`Catalog returned ${response.status}`);
     const meta = await response.json();
     fillDatalist("locality-list", meta.localities);
@@ -237,20 +240,28 @@ async function search() {
   showSkeletons();
 
   const data = new FormData(form);
+  const cuisine = data.get("cuisine");
   const payload = {
     location: data.get("locality"),
     budget_tier: data.get("budget"),
-    cuisines: data.get("cuisine") || null,
+    cuisines: cuisine && cuisine.trim() ? [cuisine.trim()] : [],
     min_rating: Number(data.get("min_rating")),
     additional_preferences: data.get("extras") || null,
   };
 
   try {
-    const response = await fetch(`${API_BASE}/api/v1/recommendations`, {
+    let response = await fetch(`${API_BASE}/api/v1/recommendations`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+    if (!response.ok) {
+      response = await fetch(`${API_BASE}/api/recommend`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    }
     if (!response.ok) throw new Error(`Recommendation API returned ${response.status}`);
     const result = await response.json();
     renderResults(result);
