@@ -21,11 +21,11 @@
     },
     {
       "source": "/",
-      "destination": "/index.html"
+      "destination": "/app/static/index.html"
     },
     {
       "source": "/app",
-      "destination": "/index.html"
+      "destination": "/app/static/index.html"
     },
     {
       "source": "/static/:path*",
